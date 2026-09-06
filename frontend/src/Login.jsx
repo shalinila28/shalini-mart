@@ -4,10 +4,13 @@ function Login() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [message, setMessage] = useState("");
 
     const handleLogin = async (e) => {
 
         e.preventDefault();
+
+        setMessage("");
 
         try {
 
@@ -29,36 +32,60 @@ function Login() {
 
             const data = await response.json();
 
-            if (response.ok) {
+            // =====================================
+            // LOGIN FAILED
+            // =====================================
 
-                alert("Login successful!");
+            if (!response.ok || typeof data === "string") {
 
-                console.log("Logged in user:", data);
+                setMessage(
+                    typeof data === "string"
+                        ? data
+                        : "Invalid Email or Password"
+                );
 
-                // Role checking
-                if (data.role === "ADMIN") {
+                return;
+            }
 
-                    console.log("Open Admin Dashboard");
 
-                } else if (data.role === "SELLER") {
+            // =====================================
+            // SAVE LOGGED-IN USER
+            // =====================================
 
-                    console.log("Open Seller Dashboard");
+            localStorage.setItem(
+                "loggedInUser",
+                JSON.stringify(data)
+            );
 
-                } else if (data.role === "CUSTOMER") {
 
-                    console.log("Open Customer Dashboard");
-                }
+            // =====================================
+            // CHECK ROLE
+            // =====================================
+
+            if (data.role === "CUSTOMER") {
+
+                window.location.href = "/customer";
+
+            } else if (data.role === "SELLER") {
+
+                window.location.href = "/seller";
+
+            } else if (data.role === "ADMIN") {
+
+                window.location.href = "/admin";
 
             } else {
 
-                alert(data);
+                setMessage("Invalid user role.");
             }
 
         } catch (error) {
 
             console.error(error);
 
-            alert("Cannot connect to backend");
+            setMessage(
+                "Cannot connect to backend."
+            );
         }
     };
 
@@ -67,7 +94,7 @@ function Login() {
 
         <div>
 
-            <h2>Login</h2>
+            <h1>ShaliniMart Login</h1>
 
             <form onSubmit={handleLogin}>
 
@@ -75,21 +102,28 @@ function Login() {
 
                     <label>Email</label>
 
+                    <br />
+
                     <input
                         type="email"
                         value={email}
                         onChange={(e) =>
                             setEmail(e.target.value)
                         }
+                        placeholder="Enter your email"
                         required
                     />
 
                 </div>
 
+                <br />
+
 
                 <div>
 
                     <label>Password</label>
+
+                    <br />
 
                     <input
                         type="password"
@@ -97,10 +131,14 @@ function Login() {
                         onChange={(e) =>
                             setPassword(e.target.value)
                         }
+                        placeholder="Enter your password"
                         required
                     />
 
                 </div>
+
+
+                <br />
 
 
                 <button type="submit">
@@ -108,6 +146,15 @@ function Login() {
                 </button>
 
             </form>
+
+
+            {message && (
+
+                <p>
+                    {message}
+                </p>
+
+            )}
 
         </div>
     );

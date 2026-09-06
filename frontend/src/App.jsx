@@ -1,33 +1,101 @@
-import React, { useState } from "react";
-
-import Login from "./Login";
+import Home from "./Home";
 import Register from "./Register";
+import Login from "./Login";
+import CustomerDashboard from "./CustomerDashboard";
+import SellerDashboard from "./SellerDashboard";
+import Cart from "./Cart";
 
 function App() {
 
-    const [page, setPage] = useState("login");
-
-    return (
-
-        <div>
-
-            <h1>ShaliniMart</h1>
-
-            <button onClick={() => setPage("login")}>
-                Login
-            </button>
-
-            <button onClick={() => setPage("register")}>
-                Create Account
-            </button>
+    const path = window.location.pathname;
 
 
-            {page === "login" && <Login />}
+    // =====================================
+    // HOME PAGE
+    // =====================================
 
-            {page === "register" && <Register />}
+    if (path === "/") {
+        return <Home />;
+    }
 
-        </div>
-    );
+
+    // =====================================
+    // REGISTER
+    // =====================================
+
+    if (path === "/register") {
+        return <Register />;
+    }
+
+
+    // =====================================
+    // LOGIN
+    // =====================================
+
+    if (path === "/login") {
+        return <Login />;
+    }
+
+
+    // =====================================
+    // CUSTOMER DASHBOARD
+    // =====================================
+
+    if (path === "/customer") {
+        return <CustomerDashboard />;
+    }
+
+
+    // =====================================
+    // SELLER DASHBOARD
+    // =====================================
+
+    if (path === "/seller") {
+        return <SellerDashboard />;
+    }
+
+
+    // =====================================
+    // CART
+    // =====================================
+
+    if (path === "/cart") {
+        return <Cart />;
+    }
+
+
+    // =====================================
+    // ADMIN DASHBOARD
+    // =====================================
+
+    if (path === "/admin") {
+
+        return (
+
+            <div>
+
+                <h1>
+                    ShaliniMart
+                </h1>
+
+                <h2>
+                    Admin Dashboard
+                </h2>
+
+                <p>
+                    Welcome Admin!
+                </p>
+
+            </div>
+        );
+    }
+
+
+    // =====================================
+    // UNKNOWN URL
+    // =====================================
+
+    return <Home />;
 }
 
 export default App;

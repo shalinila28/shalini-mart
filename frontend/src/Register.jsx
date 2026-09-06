@@ -6,10 +6,12 @@ function Register() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [role, setRole] = useState("CUSTOMER");
+    const [message, setMessage] = useState("");
 
     const handleRegister = async (e) => {
 
         e.preventDefault();
+        setMessage("");
 
         try {
 
@@ -33,24 +35,24 @@ function Register() {
 
             const data = await response.text();
 
-            if (response.ok) {
+            setMessage(data);
 
-                alert("Registration successful!");
+            if (response.ok &&
+                data === "Registration Successful!") {
 
                 setUsername("");
                 setEmail("");
                 setPassword("");
                 setRole("CUSTOMER");
-
-            } else {
-
-                alert(data);
             }
 
         } catch (error) {
 
             console.error(error);
-            alert("Cannot connect to backend");
+
+            setMessage(
+                "Cannot connect to backend."
+            );
         }
     };
 
@@ -59,12 +61,21 @@ function Register() {
 
         <div>
 
+            <h1>ShaliniMart</h1>
+
             <h2>Create Account</h2>
 
             <form onSubmit={handleRegister}>
 
+                {/* USERNAME */}
+
                 <div>
-                    <label>Username</label>
+
+                    <label>
+                        Username
+                    </label>
+
+                    <br />
 
                     <input
                         type="text"
@@ -72,13 +83,24 @@ function Register() {
                         onChange={(e) =>
                             setUsername(e.target.value)
                         }
+                        placeholder="Enter username"
                         required
                     />
+
                 </div>
 
+                <br />
+
+
+                {/* EMAIL */}
 
                 <div>
-                    <label>Email</label>
+
+                    <label>
+                        Email
+                    </label>
+
+                    <br />
 
                     <input
                         type="email"
@@ -86,13 +108,24 @@ function Register() {
                         onChange={(e) =>
                             setEmail(e.target.value)
                         }
+                        placeholder="Enter email"
                         required
                     />
+
                 </div>
 
+                <br />
+
+
+                {/* PASSWORD */}
 
                 <div>
-                    <label>Password</label>
+
+                    <label>
+                        Password
+                    </label>
+
+                    <br />
 
                     <input
                         type="password"
@@ -100,14 +133,24 @@ function Register() {
                         onChange={(e) =>
                             setPassword(e.target.value)
                         }
+                        placeholder="Enter password"
                         required
                     />
+
                 </div>
 
+                <br />
+
+
+                {/* ROLE */}
 
                 <div>
 
-                    <label>Role</label>
+                    <label>
+                        Select Role
+                    </label>
+
+                    <br />
 
                     <select
                         value={role}
@@ -128,12 +171,39 @@ function Register() {
 
                 </div>
 
+                <br />
+
 
                 <button type="submit">
                     Register
                 </button>
 
             </form>
+
+
+            <br />
+
+
+            {message && (
+
+                <p>
+                    {message}
+                </p>
+
+            )}
+
+
+            <p>
+                Already have an account?
+            </p>
+
+            <button
+                onClick={() =>
+                    window.location.href = "/login"
+                }
+            >
+                Go to Login
+            </button>
 
         </div>
     );
