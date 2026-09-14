@@ -4,6 +4,7 @@ import Login from "./Login";
 import CustomerDashboard from "./CustomerDashboard";
 import SellerDashboard from "./SellerDashboard";
 import Cart from "./Cart";
+import AdminDashboard from "./AdminDashboard";
 
 function App() {
 
@@ -69,25 +70,7 @@ function App() {
     // =====================================
 
     if (path === "/admin") {
-
-        return (
-
-            <div>
-
-                <h1>
-                    ShaliniMart
-                </h1>
-
-                <h2>
-                    Admin Dashboard
-                </h2>
-
-                <p>
-                    Welcome Admin!
-                </p>
-
-            </div>
-        );
+        return <AdminDashboard />;
     }
 
 
