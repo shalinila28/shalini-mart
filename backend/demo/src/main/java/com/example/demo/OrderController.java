@@ -2,8 +2,8 @@ package com.example.demo;
 
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -13,65 +13,44 @@ public class OrderController {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final CartItemRepository cartItemRepository;
-    private final ProductRepository productRepository;
-
-
-    // ==========================================
-    // CONSTRUCTOR
-    // ==========================================
 
     public OrderController(
             OrderRepository orderRepository,
             OrderItemRepository orderItemRepository,
-            CartItemRepository cartItemRepository,
-            ProductRepository productRepository) {
+            CartItemRepository cartItemRepository) {
 
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.cartItemRepository = cartItemRepository;
-        this.productRepository = productRepository;
     }
 
-
-    // ==========================================
+    // =========================================================
     // F5 - CHECKOUT
-    // ==========================================
+    // =========================================================
 
     @PostMapping("/checkout/{customerId}")
-    public String checkout(
+    public Object checkout(
             @PathVariable int customerId) {
 
+        // Get customer's cart
         List<CartItem> cartItems =
                 cartItemRepository.findByCustomerId(customerId);
 
+        // Check whether cart is empty
         if (cartItems.isEmpty()) {
             return "Cart is empty!";
         }
 
-
         // Calculate total amount
-
         double totalAmount = 0;
 
         for (CartItem item : cartItems) {
 
             totalAmount +=
-                    item.getPrice() *
-                    item.getQuantity();
+                    item.getPrice() * item.getQuantity();
         }
-
-
-        // Mock payment
-
-        boolean paymentSuccessful = true;
-
-        if (!paymentSuccessful) {
-            return "Payment failed!";
-        }
-
 
         // Create order
-
         Order order =
                 new Order(
                         customerId,
@@ -79,45 +58,34 @@ public class OrderController {
                         "CONFIRMED"
                 );
 
+        // Save order first
         Order savedOrder =
                 orderRepository.save(order);
 
-
         // Create order items
-
-        for (CartItem cartItem : cartItems) {
+        for (CartItem item : cartItems) {
 
             OrderItem orderItem =
                     new OrderItem(
                             savedOrder.getId(),
-                            cartItem.getProductId(),
-                            cartItem.getQuantity(),
-                            cartItem.getPrice()
+                            item.getProductId(),
+                            item.getQuantity(),
+                            item.getPrice()
                     );
 
             orderItemRepository.save(orderItem);
         }
 
+        // Clear customer's cart
+        cartItemRepository.deleteAll(cartItems);
 
-        // Clear cart
-
-        for (CartItem cartItem : cartItems) {
-
-            cartItemRepository.deleteById(
-                    cartItem.getId()
-            );
-        }
-
-
-        return
-                "Order placed successfully! Order ID: "
-                + savedOrder.getId();
+        return savedOrder;
     }
 
 
-    // ==========================================
+    // =========================================================
     // F6 - CUSTOMER ORDER HISTORY
-    // ==========================================
+    // =========================================================
 
     @GetMapping("/customer/{customerId}")
     public List<Order> getCustomerOrders(
@@ -129,75 +97,63 @@ public class OrderController {
     }
 
 
-    // ==========================================
-    // F6 - SELLER INCOMING ORDERS
-    // ==========================================
+    // =========================================================
+    // F6 - GET ORDER ITEMS
+    // =========================================================
 
-    @GetMapping("/seller/{sellerId}")
-    public List<SellerOrderDTO> getSellerOrders(
-            @PathVariable int sellerId) {
+    @GetMapping("/{orderId}/items")
+    public List<OrderItem> getOrderItems(
+            @PathVariable int orderId) {
 
-        List<SellerOrderDTO> sellerOrders =
-                new ArrayList<>();
-
-
-        // Get all orders
-
-        List<Order> allOrders =
-                orderRepository.findAll();
+        return orderItemRepository.findByOrderId(
+                orderId
+        );
+    }
 
 
-        // Check every order
+    // =========================================================
+    // F8 - CUSTOMER RECEIVED ORDER
+    // =========================================================
 
-        for (Order order : allOrders) {
+    @PutMapping("/{orderId}/received")
+    public Object markOrderReceived(
+            @PathVariable int orderId,
+            @RequestParam int customerId) {
 
-            // Get items inside this order
+        // Find order
+        Optional<Order> optionalOrder =
+                orderRepository.findById(orderId);
 
-            List<OrderItem> orderItems =
-                    orderItemRepository.findByOrderId(
-                            order.getId()
-                    );
+        // Check order exists
+        if (optionalOrder.isEmpty()) {
 
-
-            // Check every product in the order
-
-            for (OrderItem orderItem : orderItems) {
-
-                Product product =
-                        productRepository.findById(
-                                orderItem.getProductId()
-                        ).orElse(null);
-
-
-                // Product exists?
-
-                if (product == null) {
-                    continue;
-                }
-
-
-                // Does this product belong
-                // to the logged-in seller?
-
-                if (product.getSellerId() == sellerId) {
-
-                    SellerOrderDTO dto =
-                            new SellerOrderDTO(
-                                    order.getId(),
-                                    order.getCustomerId(),
-                                    product.getId(),
-                                    product.getName(),
-                                    orderItem.getQuantity(),
-                                    orderItem.getPrice(),
-                                    order.getStatus()
-                            );
-
-                    sellerOrders.add(dto);
-                }
-            }
+            return "Order not found!";
         }
 
+        Order order =
+                optionalOrder.get();
 
-        return sellerOrders;
+        // Check whether this order belongs to this customer
+        if (order.getCustomerId() != customerId) {
+
+            return "You cannot update this order!";
+        }
+
+        // Only CONFIRMED orders can be marked as RECEIVED
+        if (!"CONFIRMED".equalsIgnoreCase(
+                order.getStatus())) {
+
+            return "Only confirmed orders can be marked as received!";
+        }
+
+        // Change status
+        order.setStatus("RECEIVED");
+
+        // Save updated order
+        Order updatedOrder =
+                orderRepository.save(order);
+
+        // Return updated order as JSON
+        return updatedOrder;
     }
 }
