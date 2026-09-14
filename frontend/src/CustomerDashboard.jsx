@@ -4,6 +4,7 @@ function CustomerDashboard() {
 
     const [products, setProducts] = useState([]);
     const [cart, setCart] = useState([]);
+    const [orders, setOrders] = useState([]);
     const [message, setMessage] = useState("");
 
     const loggedInUser =
@@ -24,7 +25,10 @@ function CustomerDashboard() {
                 setProducts(data);
             })
             .catch(error => {
-                console.error("Product loading error:", error);
+                console.error(
+                    "Product loading error:",
+                    error
+                );
             });
 
     }, []);
@@ -40,13 +44,18 @@ function CustomerDashboard() {
             return;
         }
 
-        fetch(`http://localhost:8080/api/cart/${customerId}`)
+        fetch(
+            `http://localhost:8080/api/cart/${customerId}`
+        )
             .then(response => response.json())
             .then(data => {
                 setCart(data);
             })
             .catch(error => {
-                console.error("Cart loading error:", error);
+                console.error(
+                    "Cart loading error:",
+                    error
+                );
             });
     };
 
@@ -57,18 +66,55 @@ function CustomerDashboard() {
 
 
     // =========================
+    // LOAD ORDER HISTORY
+    // =========================
+
+    const loadOrders = () => {
+
+        if (!customerId) {
+            return;
+        }
+
+        fetch(
+            `http://localhost:8080/api/orders/customer/${customerId}`
+        )
+            .then(response => response.json())
+            .then(data => {
+                setOrders(data);
+            })
+            .catch(error => {
+                console.error(
+                    "Order history loading error:",
+                    error
+                );
+            });
+    };
+
+
+    useEffect(() => {
+        loadOrders();
+    }, [customerId]);
+
+
+    // =========================
     // ADD TO CART
     // =========================
 
     const addToCart = async (product) => {
 
         if (!loggedInUser) {
+
             alert("Please login first.");
+
             return;
         }
 
         if (loggedInUser.role !== "CUSTOMER") {
-            alert("Only customers can add products to cart.");
+
+            alert(
+                "Only customers can add products to cart."
+            );
+
             return;
         }
 
@@ -97,7 +143,10 @@ function CustomerDashboard() {
                 const errorText =
                     await response.text();
 
-                alert("Failed to add product: " + errorText);
+                alert(
+                    "Failed to add product: " +
+                    errorText
+                );
 
                 return;
             }
@@ -113,7 +162,9 @@ function CustomerDashboard() {
 
             console.error(error);
 
-            alert("Cannot connect to backend.");
+            alert(
+                "Cannot connect to backend."
+            );
         }
     };
 
@@ -122,7 +173,10 @@ function CustomerDashboard() {
     // UPDATE QUANTITY
     // =========================
 
-    const updateQuantity = async (cartItem, newQuantity) => {
+    const updateQuantity = async (
+        cartItem,
+        newQuantity
+    ) => {
 
         if (newQuantity < 1) {
             return;
@@ -147,7 +201,9 @@ function CustomerDashboard() {
 
             if (!response.ok) {
 
-                alert("Unable to update quantity.");
+                alert(
+                    "Unable to update quantity."
+                );
 
                 return;
             }
@@ -158,7 +214,9 @@ function CustomerDashboard() {
 
             console.error(error);
 
-            alert("Cannot connect to backend.");
+            alert(
+                "Cannot connect to backend."
+            );
         }
     };
 
@@ -180,7 +238,9 @@ function CustomerDashboard() {
 
             if (!response.ok) {
 
-                alert("Unable to remove item.");
+                alert(
+                    "Unable to remove item."
+                );
 
                 return;
             }
@@ -191,7 +251,9 @@ function CustomerDashboard() {
 
             console.error(error);
 
-            alert("Cannot connect to backend.");
+            alert(
+                "Cannot connect to backend."
+            );
         }
     };
 
@@ -219,7 +281,9 @@ function CustomerDashboard() {
 
         if (cart.length === 0) {
 
-            alert("Your cart is empty.");
+            alert(
+                "Your cart is empty."
+            );
 
             return;
         }
@@ -259,7 +323,11 @@ function CustomerDashboard() {
 
             alert(result);
 
+            // Refresh cart
             loadCart();
+
+            // Refresh order history
+            loadOrders();
 
         } catch (error) {
 
@@ -268,7 +336,9 @@ function CustomerDashboard() {
                 error
             );
 
-            alert("Cannot connect to backend.");
+            alert(
+                "Cannot connect to backend."
+            );
         }
     };
 
@@ -279,7 +349,9 @@ function CustomerDashboard() {
 
     const logout = () => {
 
-        localStorage.removeItem("loggedInUser");
+        localStorage.removeItem(
+            "loggedInUser"
+        );
 
         window.location.href = "/";
     };
@@ -291,12 +363,16 @@ function CustomerDashboard() {
 
     return (
 
-        <div style={{
-            padding: "30px",
-            fontFamily: "Arial"
-        }}>
+        <div
+            style={{
+                padding: "30px",
+                fontFamily: "Arial"
+            }}
+        >
 
-            <h1>Customer Dashboard</h1>
+            <h1>
+                Customer Dashboard
+            </h1>
 
             <p>
                 Welcome, {loggedInUser?.username}
@@ -309,11 +385,15 @@ function CustomerDashboard() {
 
             {/* ================= PRODUCTS ================= */}
 
-            <h2>Available Products</h2>
+            <h2>
+                Available Products
+            </h2>
 
             {products.length === 0 ? (
 
-                <p>No products available.</p>
+                <p>
+                    No products available.
+                </p>
 
             ) : (
 
@@ -328,7 +408,9 @@ function CustomerDashboard() {
                         }}
                     >
 
-                        <h3>{product.name}</h3>
+                        <h3>
+                            {product.name}
+                        </h3>
 
                         <p>
                             {product.description}
@@ -345,6 +427,19 @@ function CustomerDashboard() {
                         <p>
                             Category: {product.category}
                         </p>
+
+                        {product.imageUrl && (
+
+                            <img
+                                src={product.imageUrl}
+                                alt={product.name}
+                                width="150"
+                            />
+
+                        )}
+
+                        <br />
+                        <br />
 
                         <button
                             onClick={() =>
@@ -365,11 +460,15 @@ function CustomerDashboard() {
 
             {/* ================= CART ================= */}
 
-            <h2>🛒 My Cart</h2>
+            <h2>
+                🛒 My Cart
+            </h2>
 
             {cart.length === 0 ? (
 
-                <p>Your cart is empty.</p>
+                <p>
+                    Your cart is empty.
+                </p>
 
             ) : (
 
@@ -445,7 +544,9 @@ function CustomerDashboard() {
 
                             <button
                                 onClick={() =>
-                                    removeFromCart(item.id)
+                                    removeFromCart(
+                                        item.id
+                                    )
                                 }
                             >
                                 Remove
@@ -479,7 +580,7 @@ function CustomerDashboard() {
             )}
 
 
-            {/* SUCCESS MESSAGE */}
+            {/* ================= SUCCESS MESSAGE ================= */}
 
             {message && (
 
@@ -487,6 +588,57 @@ function CustomerDashboard() {
                     ✅ {message}
                 </h3>
 
+            )}
+
+
+            <hr />
+
+
+            {/* ================= ORDER HISTORY ================= */}
+
+            <h2>
+                📦 My Orders
+            </h2>
+
+            {orders.length === 0 ? (
+
+                <p>
+                    No orders found.
+                </p>
+
+            ) : (
+
+                orders.map(order => (
+
+                    <div
+                        key={order.id}
+                        style={{
+                            border: "1px solid green",
+                            padding: "15px",
+                            margin: "10px 0"
+                        }}
+                    >
+
+                        <h3>
+                            Order ID: {order.id}
+                        </h3>
+
+                        <p>
+                            Customer ID: {order.customerId}
+                        </p>
+
+                        <p>
+                            Total Amount: ₹
+                            {order.totalAmount}
+                        </p>
+
+                        <p>
+                            Status: {order.status}
+                        </p>
+
+                    </div>
+
+                ))
             )}
 
         </div>
