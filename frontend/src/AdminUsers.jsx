@@ -47,7 +47,7 @@ function AdminUsers() {
         try {
 
             const response = await fetch(
-                "http://localhost:8080/api/admin/users"
+                "https://shalini-mart-production.up.railway.app/api/admin/users"
             );
 
             if (!response.ok) {
@@ -107,7 +107,7 @@ function AdminUsers() {
         try {
 
             const response = await fetch(
-                `http://localhost:8080/api/admin/users/${id}`,
+                `https://shalini-mart-production.up.railway.app/api/admin/users/${id}`,
                 {
                     method: "DELETE"
                 }

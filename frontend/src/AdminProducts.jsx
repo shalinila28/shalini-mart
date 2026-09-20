@@ -62,7 +62,7 @@ function AdminProducts() {
             setLoading(true);
 
             const response = await fetch(
-                "http://localhost:8080/api/admin/products"
+                "https://shalini-mart-production.up.railway.app/api/admin/products"
             );
 
             if (!response.ok) {
@@ -111,7 +111,7 @@ function AdminProducts() {
         try {
 
             const response = await fetch(
-                `http://localhost:8080/api/admin/products/${id}`,
+                `https://shalini-mart-production.up.railway.app/api/admin/products/${id}`,
                 {
                     method: "DELETE"
                 }

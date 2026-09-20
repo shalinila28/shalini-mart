@@ -80,7 +80,7 @@ function CustomerDashboard() {
     useEffect(() => {
 
         fetch(
-            "http://localhost:8080/api/products"
+            "https://shalini-mart-production.up.railway.app/api/products"
         )
             .then(response => {
 
@@ -145,7 +145,7 @@ function CustomerDashboard() {
     const loadCartCount = () => {
 
         fetch(
-            `http://localhost:8080/api/cart/${customerId}`
+            `https://shalini-mart-production.up.railway.app/api/cart/${customerId}`
         )
             .then(response => {
 
@@ -194,7 +194,7 @@ function CustomerDashboard() {
     ) => {
 
         fetch(
-            `http://localhost:8080/api/reviews/product/${productId}`
+            `https://shalini-mart-production.up.railway.app/api/reviews/product/${productId}`
         )
             .then(response => {
 
@@ -240,7 +240,7 @@ function CustomerDashboard() {
         }
 
         fetch(
-            `http://localhost:8080/api/reviews/can-review?customerId=${customerId}&productId=${productId}`
+            `https://shalini-mart-production.up.railway.app/api/reviews/can-review?customerId=${customerId}&productId=${productId}`
         )
             .then(response => {
 
@@ -313,7 +313,7 @@ function CustomerDashboard() {
 
 
         fetch(
-            "http://localhost:8080/api/cart",
+            "https://shalini-mart-production.up.railway.app/api/cart",
             {
                 method: "POST",
 
@@ -428,7 +428,7 @@ function CustomerDashboard() {
 
 
         fetch(
-            "http://localhost:8080/api/reviews",
+            "https://shalini-mart-production.up.railway.app/api/reviews",
             {
                 method: "POST",
 
@@ -569,7 +569,7 @@ function CustomerDashboard() {
 
 
         fetch(
-            `http://localhost:8080/api/reviews/${review.id}?customerId=${customerId}`,
+            `https://shalini-mart-production.up.railway.app/api/reviews/${review.id}?customerId=${customerId}`,
             {
                 method: "PUT",
 
@@ -645,7 +645,7 @@ function CustomerDashboard() {
 
 
         fetch(
-            `http://localhost:8080/api/reviews/${review.id}?customerId=${customerId}`,
+            `https://shalini-mart-production.up.railway.app/api/reviews/${review.id}?customerId=${customerId}`,
             {
                 method: "DELETE"
             }

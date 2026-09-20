@@ -77,7 +77,7 @@ function AdminDashboard() {
 
 
             const response = await fetch(
-                "http://localhost:8080/api/admin/summary"
+                "https://shalini-mart-production.up.railway.app/api/admin/summary"
             );
 
 

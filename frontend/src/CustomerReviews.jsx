@@ -47,7 +47,7 @@ function CustomerReviews({ productId }) {
 
             const response =
                 await fetch(
-                    `http://localhost:8080/api/reviews/product/${productId}`
+                    `https://shalini-mart-production.up.railway.app/api/reviews/product/${productId}`
                 );
 
             if (!response.ok) {
@@ -113,7 +113,7 @@ function CustomerReviews({ productId }) {
                 response =
                     await fetch(
 
-                        `http://localhost:8080/api/reviews/${editingId}?customerId=${customerId}`,
+                        `https://shalini-mart-production.up.railway.app/api/reviews/${editingId}?customerId=${customerId}`,
 
                         {
                             method: "PUT",
@@ -148,7 +148,7 @@ function CustomerReviews({ productId }) {
                 response =
                     await fetch(
 
-                        "http://localhost:8080/api/reviews",
+                        "https://shalini-mart-production.up.railway.app/api/reviews",
 
                         {
                             method: "POST",
@@ -295,7 +295,7 @@ function CustomerReviews({ productId }) {
             const response =
                 await fetch(
 
-                    `http://localhost:8080/api/reviews/${review.id}?customerId=${customerId}`,
+                    `https://shalini-mart-production.up.railway.app/api/reviews/${review.id}?customerId=${customerId}`,
 
                     {
                         method: "DELETE"

@@ -62,7 +62,7 @@ function AdminReviews() {
             setLoading(true);
 
             const response = await fetch(
-                "http://localhost:8080/api/admin/reviews"
+                "https://shalini-mart-production.up.railway.app/api/admin/reviews"
             );
 
             if (!response.ok) {
@@ -111,7 +111,7 @@ function AdminReviews() {
         try {
 
             const response = await fetch(
-                `http://localhost:8080/api/admin/reviews/${id}`,
+                `https://shalini-mart-production.up.railway.app/api/admin/reviews/${id}`,
                 {
                     method: "DELETE"
                 }

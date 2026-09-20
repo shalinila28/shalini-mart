@@ -62,7 +62,7 @@ function AdminOrders() {
             setLoading(true);
 
             const response = await fetch(
-                "http://localhost:8080/api/admin/orders"
+                "https://shalini-mart-production.up.railway.app/api/admin/orders"
             );
 
             if (!response.ok) {

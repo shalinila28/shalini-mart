@@ -54,7 +54,7 @@ function Register() {
         try {
 
             const response = await fetch(
-                "http://localhost:8080/api/register",
+                "https://shalini-mart-production.up.railway.app/api/register",
                 {
                     method: "POST",
 

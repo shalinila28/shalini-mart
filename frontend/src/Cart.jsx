@@ -30,7 +30,7 @@ function Cart() {
 
     useEffect(() => {
 
-        fetch("http://localhost:8080/api/products")
+        fetch("https://shalini-mart-production.up.railway.app/api/products")
             .then(response => {
 
                 if (!response.ok) {
@@ -73,7 +73,7 @@ function Cart() {
     const loadCart = () => {
 
         fetch(
-            `http://localhost:8080/api/cart/${customerId}`
+            `https://shalini-mart-production.up.railway.app/api/cart/${customerId}`
         )
             .then(response => {
 
@@ -114,7 +114,7 @@ function Cart() {
         }
 
         fetch(
-            `http://localhost:8080/api/cart/${cartItem.id}`,
+            `https://shalini-mart-production.up.railway.app/api/cart/${cartItem.id}`,
             {
                 method: "PUT",
 
@@ -173,7 +173,7 @@ function Cart() {
         }
 
         fetch(
-            `http://localhost:8080/api/cart/${id}`,
+            `https://shalini-mart-production.up.railway.app/api/cart/${id}`,
             {
                 method: "DELETE"
             }
@@ -251,7 +251,7 @@ function Cart() {
         }
 
         fetch(
-            `http://localhost:8080/api/orders/checkout/${customerId}`,
+            `https://shalini-mart-production.up.railway.app/api/orders/checkout/${customerId}`,
             {
                 method: "POST"
             }

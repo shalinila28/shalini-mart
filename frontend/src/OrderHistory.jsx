@@ -58,7 +58,7 @@ function OrderHistory() {
         try {
 
             const response = await fetch(
-                `http://localhost:8080/api/orders/customer/${customerId}`
+                `https://shalini-mart-production.up.railway.app/api/orders/customer/${customerId}`
             );
 
 
@@ -109,7 +109,7 @@ function OrderHistory() {
         try {
 
             const response = await fetch(
-                `http://localhost:8080/api/orders/${orderId}/received?customerId=${customerId}`,
+                `https://shalini-mart-production.up.railway.app/api/orders/${orderId}/received?customerId=${customerId}`,
                 {
                     method: "PUT"
                 }

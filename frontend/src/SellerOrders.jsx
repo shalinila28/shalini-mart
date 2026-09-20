@@ -30,7 +30,7 @@ function SellerOrders() {
         try {
 
             const response = await fetch(
-                `http://localhost:8080/api/orders/seller/${sellerId}`
+                `https://shalini-mart-production.up.railway.app/api/orders/seller/${sellerId}`
             );
 
 

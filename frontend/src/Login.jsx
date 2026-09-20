@@ -26,7 +26,7 @@ function Login() {
         try {
 
             const response = await fetch(
-                "http://localhost:8080/api/login",
+                "https://shalini-mart-production.up.railway.app/api/login",
                 {
                     method: "POST",
                     headers: {

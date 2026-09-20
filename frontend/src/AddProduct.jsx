@@ -72,7 +72,7 @@ function AddProduct() {
         try {
 
             const response = await fetch(
-                "http://localhost:8080/api/products",
+                "https://shalini-mart-production.up.railway.app/api/products",
                 {
                     method: "POST",
 

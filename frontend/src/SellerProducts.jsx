@@ -89,7 +89,7 @@ function SellerProducts() {
         try {
 
             const response = await fetch(
-                "http://localhost:8080/api/products"
+                "https://shalini-mart-production.up.railway.app/api/products"
             );
 
             const text = await response.text();
@@ -281,7 +281,7 @@ function SellerProducts() {
             if (editingId !== null) {
 
                 url =
-                    `http://localhost:8080/api/products/${editingId}?sellerId=${sellerId}`;
+                    `https://shalini-mart-production.up.railway.app/api/products/${editingId}?sellerId=${sellerId}`;
 
                 method = "PUT";
 
@@ -295,7 +295,7 @@ function SellerProducts() {
             else {
 
                 url =
-                    "http://localhost:8080/api/products";
+                    "https://shalini-mart-production.up.railway.app/api/products";
 
                 method = "POST";
 
@@ -565,7 +565,7 @@ function SellerProducts() {
             const response =
                 await fetch(
 
-                    `http://localhost:8080/api/products/${id}?sellerId=${sellerId}`,
+                    `https://shalini-mart-production.up.railway.app/api/products/${id}?sellerId=${sellerId}`,
 
                     {
                         method: "DELETE"
