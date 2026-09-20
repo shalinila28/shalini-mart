@@ -1,75 +1,148 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./Dashboard.css"; // Import the CSS file for styling
+import CustomerReviews from "./CustomerReviews";
 
 function CustomerDashboard() {
 
+    const navigate = useNavigate();
+
+
+    // =========================
+    // LOGGED-IN USER
+    // =========================
+
     const loggedInUser =
-        JSON.parse(localStorage.getItem("loggedInUser"));
+        JSON.parse(
+            localStorage.getItem(
+                "loggedInUser"
+            )
+        );
 
-    const customerId = loggedInUser?.id;
-
-    const [products, setProducts] = useState([]);
-    const [cart, setCart] = useState([]);
-    const [orders, setOrders] = useState([]);
-
-    const [reviews, setReviews] = useState({});
-    const [reviewRating, setReviewRating] = useState({});
-    const [reviewComment, setReviewComment] = useState({});
-    const [reviewMessage, setReviewMessage] = useState({});
-    const [canReview, setCanReview] = useState({});
-
-    const [search, setSearch] = useState("");
-    const [category, setCategory] = useState("ALL");
-
-    const [loading, setLoading] = useState(true);
+    const customerId =
+        loggedInUser?.id;
 
 
-    // =========================================================
+    // =========================
+    // PRODUCT STATES
+    // =========================
+
+    const [products, setProducts] =
+        useState([]);
+
+    const [search, setSearch] =
+        useState("");
+
+    const [category, setCategory] =
+        useState("ALL");
+
+
+    // =========================
+    // CART COUNT
+    // =========================
+
+    const [cartCount, setCartCount] =
+        useState(0);
+
+
+    // =========================
+    // REVIEW STATES
+    // =========================
+
+    const [reviews, setReviews] =
+        useState({});
+
+    const [reviewRating, setReviewRating] =
+        useState({});
+
+    const [reviewComment, setReviewComment] =
+        useState({});
+
+    const [reviewMessage, setReviewMessage] =
+        useState({});
+
+    const [canReview, setCanReview] =
+        useState({});
+
+
+    // =========================
+    // MESSAGE
+    // =========================
+
+    const [message, setMessage] =
+        useState("");
+
+
+    // =====================================================
     // LOAD PRODUCTS
-    // =========================================================
+    // =====================================================
 
-    const loadProducts = () => {
+    useEffect(() => {
 
-        fetch("http://localhost:8080/api/products")
+        fetch(
+            "http://localhost:8080/api/products"
+        )
             .then(response => {
 
                 if (!response.ok) {
-                    throw new Error("Failed to load products");
+                    throw new Error(
+                        "Failed to load products"
+                    );
                 }
 
                 return response.json();
+
             })
             .then(data => {
 
                 setProducts(data);
 
                 data.forEach(product => {
-                    loadReviews(product.id);
+
+                    loadReviews(
+                        product.id
+                    );
 
                     if (customerId) {
-                        checkCanReview(product.id);
+
+                        checkCanReview(
+                            product.id
+                        );
+
                     }
+
                 });
+
             })
             .catch(error => {
 
-                console.error("Product error:", error);
+                console.error(error);
 
-                alert(
-                    "Cannot connect to backend while loading products."
+                setMessage(
+                    "Cannot connect to backend."
                 );
+
             });
-    };
+
+    }, []);
 
 
-    // =========================================================
-    // LOAD CART
-    // =========================================================
+    // =====================================================
+    // LOAD CART COUNT
+    // =====================================================
 
-    const loadCart = () => {
+    useEffect(() => {
 
         if (!customerId) {
             return;
         }
+
+        loadCartCount();
+
+    }, [customerId]);
+
+
+    const loadCartCount = () => {
 
         fetch(
             `http://localhost:8080/api/cart/${customerId}`
@@ -77,59 +150,48 @@ function CustomerDashboard() {
             .then(response => {
 
                 if (!response.ok) {
-                    throw new Error("Failed to load cart");
+                    throw new Error(
+                        "Failed to load cart"
+                    );
                 }
 
                 return response.json();
+
             })
             .then(data => {
 
-                setCart(data);
+                const count =
+                    data.reduce(
+                        (total, item) =>
+                            total +
+                            Number(
+                                item.quantity
+                            ),
+                        0
+                    );
+
+                setCartCount(count);
+
             })
             .catch(error => {
 
-                console.error("Cart error:", error);
+                console.error(
+                    "Cart count error:",
+                    error
+                );
+
             });
+
     };
 
 
-    // =========================================================
-    // LOAD ORDERS
-    // =========================================================
+    // =====================================================
+    // LOAD REVIEWS
+    // =====================================================
 
-    const loadOrders = () => {
-
-        if (!customerId) {
-            return;
-        }
-
-        fetch(
-            `http://localhost:8080/api/orders/customer/${customerId}`
-        )
-            .then(response => {
-
-                if (!response.ok) {
-                    throw new Error("Failed to load orders");
-                }
-
-                return response.json();
-            })
-            .then(data => {
-
-                setOrders(data);
-            })
-            .catch(error => {
-
-                console.error("Order error:", error);
-            });
-    };
-
-
-    // =========================================================
-    // LOAD REVIEWS FOR PRODUCT
-    // =========================================================
-
-    const loadReviews = (productId) => {
+    const loadReviews = (
+        productId
+    ) => {
 
         fetch(
             `http://localhost:8080/api/reviews/product/${productId}`
@@ -137,17 +199,21 @@ function CustomerDashboard() {
             .then(response => {
 
                 if (!response.ok) {
-                    throw new Error("Failed to load reviews");
+                    throw new Error(
+                        "Failed to load reviews"
+                    );
                 }
 
                 return response.json();
+
             })
             .then(data => {
 
-                setReviews(previous => ({
-                    ...previous,
+                setReviews(prev => ({
+                    ...prev,
                     [productId]: data
                 }));
+
             })
             .catch(error => {
 
@@ -155,15 +221,19 @@ function CustomerDashboard() {
                     "Review loading error:",
                     error
                 );
+
             });
+
     };
 
 
-    // =========================================================
-    // CHECK WHETHER CUSTOMER CAN REVIEW
-    // =========================================================
+    // =====================================================
+    // CHECK REVIEW PERMISSION
+    // =====================================================
 
-    const checkCanReview = (productId) => {
+    const checkCanReview = (
+        productId
+    ) => {
 
         if (!customerId) {
             return;
@@ -176,336 +246,164 @@ function CustomerDashboard() {
 
                 if (!response.ok) {
                     throw new Error(
-                        "Cannot check review permission"
+                        "Failed to check review permission"
                     );
                 }
 
                 return response.json();
+
             })
             .then(data => {
 
-                setCanReview(previous => ({
-                    ...previous,
+                setCanReview(prev => ({
+                    ...prev,
                     [productId]: data
                 }));
+
             })
             .catch(error => {
 
                 console.error(
-                    "Can-review error:",
+                    "Review permission error:",
                     error
                 );
+
+                setCanReview(prev => ({
+                    ...prev,
+                    [productId]: false
+                }));
+
             });
+
     };
 
 
-    // =========================================================
-    // INITIAL LOAD
-    // =========================================================
-
-    useEffect(() => {
-
-        if (!loggedInUser) {
-
-            alert("Please login first.");
-
-            window.location.href = "/login";
-
-            return;
-        }
-
-        if (
-            loggedInUser.role &&
-            loggedInUser.role.toUpperCase() !== "CUSTOMER"
-        ) {
-
-            alert("Customer access only.");
-
-            window.location.href = "/";
-
-            return;
-        }
-
-        loadProducts();
-        loadCart();
-        loadOrders();
-
-        setLoading(false);
-
-    }, []);
-
-
-    // =========================================================
+    // =====================================================
     // ADD TO CART
-    // =========================================================
+    // =====================================================
 
-    const addToCart = (product) => {
+    const addToCart = (
+        product
+    ) => {
 
         if (!customerId) {
 
-            alert("Customer not logged in.");
+            alert(
+                "Please login as customer."
+            );
 
             return;
         }
+
 
         const cartItem = {
 
-            customerId: customerId,
+            customerId:
+                customerId,
 
-            productId: product.id,
+            productId:
+                product.id,
 
             quantity: 1,
 
-            price: product.price
+            price:
+                product.price
+
         };
 
 
-        fetch("http://localhost:8080/api/cart", {
-
-            method: "POST",
-
-            headers: {
-                "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify(cartItem)
-        })
-            .then(async response => {
-
-                const text =
-                    await response.text();
-
-                if (!response.ok) {
-
-                    throw new Error(text);
-                }
-
-                return text;
-            })
-            .then(() => {
-
-                alert(
-                    `${product.name} added to cart!`
-                );
-
-                loadCart();
-            })
-            .catch(error => {
-
-                console.error(
-                    "Add cart error:",
-                    error
-                );
-
-                alert(
-                    "Cannot add product to cart.\n\n" +
-                    error.message
-                );
-            });
-    };
-
-
-    // =========================================================
-    // UPDATE CART QUANTITY
-    // =========================================================
-
-    const updateQuantity = (
-        cartItemId,
-        quantity
-    ) => {
-
-        if (quantity < 1) {
-            return;
-        }
-
         fetch(
-            `http://localhost:8080/api/cart/${cartItemId}`,
+            "http://localhost:8080/api/cart",
             {
-
-                method: "PUT",
+                method: "POST",
 
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type":
+                        "application/json"
                 },
 
-                body: JSON.stringify({
-                    quantity: quantity
-                })
+                body:
+                    JSON.stringify(
+                        cartItem
+                    )
             }
         )
-            .then(async response => {
-
-                const text =
-                    await response.text();
+            .then(response => {
 
                 if (!response.ok) {
-
-                    throw new Error(text);
+                    throw new Error(
+                        "Failed to add cart"
+                    );
                 }
 
-                return text;
+                return response.json();
+
             })
             .then(() => {
 
-                loadCart();
+                alert(
+                    "Product added to cart!"
+                );
+
+                loadCartCount();
+
             })
             .catch(error => {
 
-                console.error(
-                    "Update cart error:",
-                    error
+                console.error(error);
+
+                alert(
+                    "Cannot connect to backend."
                 );
+
             });
+
     };
 
 
-    // =========================================================
-    // DELETE CART ITEM
-    // =========================================================
+    // =====================================================
+    // SUBMIT REVIEW
+    // =====================================================
 
-    const removeFromCart = (cartItemId) => {
+    const submitReview = (
+        productId
+    ) => {
 
-        fetch(
-            `http://localhost:8080/api/cart/${cartItemId}`,
-            {
-                method: "DELETE"
-            }
-        )
-            .then(async response => {
+        const rating =
+            reviewRating[
+                productId
+            ];
 
-                const text =
-                    await response.text();
-
-                if (!response.ok) {
-
-                    throw new Error(text);
-                }
-
-                return text;
-            })
-            .then(() => {
-
-                loadCart();
-            })
-            .catch(error => {
-
-                console.error(
-                    "Remove cart error:",
-                    error
-                );
-            });
-    };
+        const comment =
+            reviewComment[
+                productId
+            ] || "";
 
 
-    // =========================================================
-    // MARK ORDER AS RECEIVED
-    // =========================================================
+        if (!customerId) {
 
-    const markOrderReceived = (orderId) => {
-
-        const confirmReceived =
-            window.confirm(
-                "Have you received this order?"
+            alert(
+                "Please login as customer."
             );
 
-        if (!confirmReceived) {
             return;
         }
 
 
-        const url =
-            `http://localhost:8080/api/orders/${orderId}/received?customerId=${customerId}`;
+        if (!canReview[productId]) {
 
+            alert(
+                "You can review this product only after receiving your order."
+            );
 
-        console.log(
-            "Calling receive API:",
-            url
-        );
-
-
-        fetch(url, {
-
-            method: "PUT"
-        })
-            .then(async response => {
-
-                const text =
-                    await response.text();
-
-                console.log(
-                    "Receive order status:",
-                    response.status
-                );
-
-                console.log(
-                    "Backend response:",
-                    text
-                );
-
-
-                if (!response.ok) {
-
-                    throw new Error(
-                        text ||
-                        "Failed to mark order as received."
-                    );
-                }
-
-
-                return text;
-            })
-            .then(() => {
-
-                alert(
-                    "Order marked as RECEIVED!"
-                );
-
-
-                // Reload orders
-                loadOrders();
-
-
-                // Check review permission again
-                products.forEach(product => {
-
-                    checkCanReview(
-                        product.id
-                    );
-                });
-            })
-            .catch(error => {
-
-                console.error(
-                    "Receive order error:",
-                    error
-                );
-
-
-                alert(
-                    "Cannot mark order as received.\n\n" +
-                    error.message
-                );
-            });
-    };
-
-
-    // =========================================================
-    // SUBMIT REVIEW
-    // =========================================================
-
-    const submitReview = (productId) => {
-
-        const rating =
-            reviewRating[productId];
-
-        const comment =
-            reviewComment[productId];
+            return;
+        }
 
 
         if (!rating) {
 
             alert(
-                "Please select a rating."
+                "Please select a star rating."
             );
 
             return;
@@ -514,20 +412,24 @@ function CustomerDashboard() {
 
         const review = {
 
-            productId: productId,
+            productId:
+                productId,
 
-            customerId: customerId,
+            customerId:
+                customerId,
 
-            rating: Number(rating),
+            rating:
+                Number(rating),
 
-            comment: comment || ""
+            comment:
+                comment
+
         };
 
 
         fetch(
             "http://localhost:8080/api/reviews",
             {
-
                 method: "POST",
 
                 headers: {
@@ -535,58 +437,28 @@ function CustomerDashboard() {
                         "application/json"
                 },
 
-                body: JSON.stringify(review)
+                body:
+                    JSON.stringify(
+                        review
+                    )
             }
         )
-            .then(async response => {
-
-                const text =
-                    await response.text();
-
+            .then(response => {
 
                 if (!response.ok) {
-
                     throw new Error(
-                        text ||
-                        "Failed to submit review."
+                        "Failed to submit review"
                     );
                 }
 
+                return response.json();
 
-                return text;
             })
-            .then(text => {
-
-                let data;
-
-                try {
-
-                    data = JSON.parse(text);
-
-                } catch {
-
-                    data = null;
-                }
-
-
-                if (
-                    typeof data === "string"
-                ) {
-
-                    setReviewMessage(
-                        previous => ({
-                            ...previous,
-                            [productId]: data
-                        })
-                    );
-
-                    return;
-                }
-
+            .then(() => {
 
                 setReviewMessage(
-                    previous => ({
-                        ...previous,
+                    prev => ({
+                        ...prev,
                         [productId]:
                             "Review submitted successfully!"
                     })
@@ -594,49 +466,65 @@ function CustomerDashboard() {
 
 
                 setReviewRating(
-                    previous => ({
-                        ...previous,
-                        [productId]: ""
+                    prev => ({
+                        ...prev,
+                        [productId]:
+                            ""
                     })
                 );
 
 
                 setReviewComment(
-                    previous => ({
-                        ...previous,
-                        [productId]: ""
+                    prev => ({
+                        ...prev,
+                        [productId]:
+                            ""
                     })
                 );
 
 
-                loadReviews(productId);
+                loadReviews(
+                    productId
+                );
 
-                checkCanReview(productId);
+
+                setTimeout(() => {
+
+                    setReviewMessage(
+                        prev => ({
+                            ...prev,
+                            [productId]:
+                                ""
+                        })
+                    );
+
+                }, 3000);
+
             })
             .catch(error => {
 
-                console.error(
-                    "Review error:",
-                    error
-                );
-
+                console.error(error);
 
                 setReviewMessage(
-                    previous => ({
-                        ...previous,
+                    prev => ({
+                        ...prev,
                         [productId]:
-                            error.message
+                            "Unable to submit review."
                     })
                 );
+
             });
+
     };
 
 
-    // =========================================================
-    // EDIT REVIEW
-    // =========================================================
+    // =====================================================
+    // UPDATE REVIEW
+    // =====================================================
 
-    const editReview = (review) => {
+    const updateReview = (
+        review
+    ) => {
 
         const newRating =
             window.prompt(
@@ -655,9 +543,9 @@ function CustomerDashboard() {
 
 
         if (
+            isNaN(ratingNumber) ||
             ratingNumber < 1 ||
-            ratingNumber > 5 ||
-            !Number.isInteger(ratingNumber)
+            ratingNumber > 5
         ) {
 
             alert(
@@ -670,7 +558,7 @@ function CustomerDashboard() {
 
         const newComment =
             window.prompt(
-                "Enter your new comment:",
+                "Enter new comment:",
                 review.comment || ""
             );
 
@@ -683,7 +571,6 @@ function CustomerDashboard() {
         fetch(
             `http://localhost:8080/api/reviews/${review.id}?customerId=${customerId}`,
             {
-
                 method: "PUT",
 
                 headers: {
@@ -691,27 +578,28 @@ function CustomerDashboard() {
                         "application/json"
                 },
 
-                body: JSON.stringify({
+                body:
+                    JSON.stringify({
 
-                    rating: ratingNumber,
+                        rating:
+                            ratingNumber,
 
-                    comment: newComment
-                })
+                        comment:
+                            newComment
+
+                    })
             }
         )
-            .then(async response => {
-
-                const text =
-                    await response.text();
-
+            .then(response => {
 
                 if (!response.ok) {
-
-                    throw new Error(text);
+                    throw new Error(
+                        "Failed to update review"
+                    );
                 }
 
+                return response.json();
 
-                return text;
             })
             .then(() => {
 
@@ -719,32 +607,31 @@ function CustomerDashboard() {
                     "Review updated successfully!"
                 );
 
-
                 loadReviews(
                     review.productId
                 );
+
             })
             .catch(error => {
 
-                console.error(
-                    "Edit review error:",
-                    error
-                );
-
+                console.error(error);
 
                 alert(
-                    "Cannot update review.\n\n" +
-                    error.message
+                    "Cannot update review."
                 );
+
             });
+
     };
 
 
-    // =========================================================
+    // =====================================================
     // DELETE REVIEW
-    // =========================================================
+    // =====================================================
 
-    const deleteReview = (review) => {
+    const deleteReview = (
+        review
+    ) => {
 
         const confirmDelete =
             window.confirm(
@@ -760,23 +647,19 @@ function CustomerDashboard() {
         fetch(
             `http://localhost:8080/api/reviews/${review.id}?customerId=${customerId}`,
             {
-
                 method: "DELETE"
             }
         )
-            .then(async response => {
-
-                const text =
-                    await response.text();
-
+            .then(response => {
 
                 if (!response.ok) {
-
-                    throw new Error(text);
+                    throw new Error(
+                        "Failed to delete review"
+                    );
                 }
 
+                return response.text();
 
-                return text;
             })
             .then(() => {
 
@@ -784,30 +667,27 @@ function CustomerDashboard() {
                     "Review deleted successfully!"
                 );
 
-
                 loadReviews(
                     review.productId
                 );
+
             })
             .catch(error => {
 
-                console.error(
-                    "Delete review error:",
-                    error
-                );
-
+                console.error(error);
 
                 alert(
-                    "Cannot delete review.\n\n" +
-                    error.message
+                    "Cannot delete review."
                 );
+
             });
+
     };
 
 
-    // =========================================================
+    // =====================================================
     // LOGOUT
-    // =========================================================
+    // =====================================================
 
     const logout = () => {
 
@@ -815,39 +695,14 @@ function CustomerDashboard() {
             "loggedInUser"
         );
 
-        window.location.href = "/login";
+        navigate("/");
+
     };
 
 
-    // =========================================================
-    // CART TOTAL
-    // =========================================================
-
-    const getTotal = () => {
-
-        return cart.reduce(
-            (total, item) =>
-                total +
-                item.price *
-                item.quantity,
-            0
-        );
-    };
-
-
-    // =========================================================
+    // =====================================================
     // FILTER PRODUCTS
-    // =========================================================
-
-    const categories = [
-        "ALL",
-        ...new Set(
-            products
-                .map(product => product.category)
-                .filter(Boolean)
-        )
-    ];
-
+    // =====================================================
 
     const filteredProducts =
         products.filter(product => {
@@ -857,7 +712,8 @@ function CustomerDashboard() {
                     ?.toLowerCase()
                     .includes(
                         search.toLowerCase()
-                    ) ||
+                    )
+                ||
                 product.description
                     ?.toLowerCase()
                     .includes(
@@ -866,54 +722,134 @@ function CustomerDashboard() {
 
 
             const matchesCategory =
-                category === "ALL" ||
-                product.category === category;
+                category === "ALL"
+                ||
+                product.category ===
+                    category;
 
 
             return (
                 matchesSearch &&
                 matchesCategory
             );
+
         });
 
 
-    // =========================================================
-    // LOADING
-    // =========================================================
+    // =====================================================
+    // CATEGORIES
+    // =====================================================
 
-    if (loading) {
+    const categories = [
+
+        "ALL",
+
+        ...new Set(
+
+            products
+                .map(
+                    product =>
+                        product.category
+                )
+                .filter(Boolean)
+
+        )
+
+    ];
+
+
+    // =====================================================
+    // SECURITY
+    // =====================================================
+
+    if (!loggedInUser) {
 
         return (
-            <div style={styles.loading}>
-                Loading Customer Dashboard...
+
+            <div style={styles.center}>
+
+                <h2>
+                    Please login first.
+                </h2>
+
+                <button
+                    style={styles.button}
+                    onClick={() =>
+                        navigate(
+                            "/login"
+                        )
+                    }
+                >
+                    Go to Login
+                </button>
+
             </div>
+
         );
+
     }
 
 
-    // =========================================================
-    // PAGE
-    // =========================================================
+    if (
+        loggedInUser.role !==
+        "CUSTOMER"
+    ) {
+
+        return (
+
+            <div style={styles.center}>
+
+                <h2>
+                    Access denied!
+                </h2>
+
+                <p>
+                    This page is only for customers.
+                </p>
+
+                <button
+                    style={styles.button}
+                    onClick={logout}
+                >
+                    Logout
+                </button>
+
+            </div>
+
+        );
+
+    }
+
+
+    // =====================================================
+    // MAIN UI
+    // =====================================================
 
     return (
 
-        <div style={styles.page}>
+        <div style={styles.container}>
+
 
             {/* HEADER */}
 
-            <header style={styles.header}>
+            <div style={styles.header}>
 
                 <div>
 
                     <h1>
-                        🛍️ ShaliniMart
+                        🛒 ShaliniMart
                     </h1>
 
                     <p>
+
                         Welcome,{" "}
+
                         <b>
-                            {loggedInUser?.username}
+                            {
+                                loggedInUser.username
+                            }
                         </b>
+
                     </p>
 
                 </div>
@@ -922,18 +858,39 @@ function CustomerDashboard() {
                 <div>
 
                     <button
-                        style={styles.cartButton}
+                        style={
+                            styles.navButton
+                        }
                         onClick={() =>
-                            window.location.href =
+                            navigate(
                                 "/cart"
+                            )
                         }
                     >
-                        🛒 Cart ({cart.length})
+                        🛒 My Cart
+                        {cartCount > 0 &&
+                            ` (${cartCount})`}
                     </button>
 
 
                     <button
-                        style={styles.logoutButton}
+                        style={
+                            styles.orderButton
+                        }
+                        onClick={() =>
+                            navigate(
+                                "/orders"
+                            )
+                        }
+                    >
+                        📦 My Orders
+                    </button>
+
+
+                    <button
+                        style={
+                            styles.logoutButton
+                        }
                         onClick={logout}
                     >
                         Logout
@@ -941,664 +898,557 @@ function CustomerDashboard() {
 
                 </div>
 
-            </header>
+            </div>
 
 
-            {/* SEARCH */}
+            {/* MESSAGE */}
 
-            <section style={styles.searchSection}>
+            {message && (
 
-                <input
-                    type="text"
-                    placeholder="Search products..."
-                    value={search}
-                    onChange={e =>
-                        setSearch(e.target.value)
-                    }
-                    style={styles.searchInput}
-                />
+                <div style={styles.message}>
+                    {message}
+                </div>
 
-
-                <select
-                    value={category}
-                    onChange={e =>
-                        setCategory(e.target.value)
-                    }
-                    style={styles.categorySelect}
-                >
-
-                    {categories.map(cat => (
-
-                        <option
-                            key={cat}
-                            value={cat}
-                        >
-                            {cat}
-                        </option>
-
-                    ))}
-
-                </select>
-
-            </section>
+            )}
 
 
             {/* PRODUCTS */}
 
             <h2>
-                🛍️ Products
+                🛍️ Available Products
             </h2>
 
 
-            <div style={styles.productGrid}>
-
-                {filteredProducts.map(product => (
-
-                    <div
-                        key={product.id}
-                        style={styles.productCard}
-                    >
-
-                        {product.imageUrl && (
-
-                            <img
-                                src={product.imageUrl}
-                                alt={product.name}
-                                style={
-                                    styles.productImage
-                                }
-                            />
-
-                        )}
-
-
-                        <h3>
-                            {product.name}
-                        </h3>
-
-
-                        <p>
-                            {product.description}
-                        </p>
-
-
-                        <p>
-                            <b>
-                                ₹
-                                {product.price}
-                            </b>
-                        </p>
-
-
-                        <p>
-                            Category:{" "}
-                            {product.category}
-                        </p>
-
-
-                        <p>
-                            Stock:{" "}
-                            {product.stockQuantity}
-                        </p>
-
-
-                        <button
-                            style={styles.addButton}
-                            onClick={() =>
-                                addToCart(product)
-                            }
-                            disabled={
-                                product.stockQuantity <= 0
-                            }
-                        >
-
-                            {product.stockQuantity > 0
-                                ? "🛒 Add to Cart"
-                                : "Out of Stock"}
-
-                        </button>
-
-
-                        {/* REVIEWS */}
-
-                        <div style={styles.reviewSection}>
-
-                            <h4>
-                                ⭐ Customer Reviews
-                            </h4>
-
-
-                            {reviews[product.id] &&
-                            reviews[product.id].length > 0 ? (
-
-                                reviews[product.id].map(
-                                    review => (
-
-                                        <div
-                                            key={
-                                                review.id
-                                            }
-                                            style={
-                                                styles.reviewCard
-                                            }
-                                        >
-
-                                            <p>
-                                                {"⭐".repeat(
-                                                    review.rating
-                                                )}
-                                            </p>
-
-
-                                            <p>
-                                                {review.comment}
-                                            </p>
-
-
-                                            {review.customerId ===
-                                                customerId && (
-
-                                                <div>
-
-                                                    <button
-                                                        onClick={() =>
-                                                            editReview(
-                                                                review
-                                                            )
-                                                        }
-                                                        style={
-                                                            styles.editButton
-                                                        }
-                                                    >
-                                                        Edit
-                                                    </button>
-
-
-                                                    <button
-                                                        onClick={() =>
-                                                            deleteReview(
-                                                                review
-                                                            )
-                                                        }
-                                                        style={
-                                                            styles.deleteButton
-                                                        }
-                                                    >
-                                                        Delete
-                                                    </button>
-
-                                                </div>
-
-                                            )}
-
-                                        </div>
-
-                                    )
-                                )
-
-                            ) : (
-
-                                <p>
-                                    No reviews yet.
-                                </p>
-
-                            )}
-
-
-                            {/* REVIEW FORM */}
-
-                            {canReview[product.id] ? (
-
-                                <div
-                                    style={
-                                        styles.reviewForm
-                                    }
-                                >
-
-                                    <h4>
-                                        ⭐ Give Your Review
-                                    </h4>
-
-
-                                    <p>
-                                        You have received
-                                        this product.
-                                    </p>
-
-
-                                    <select
-                                        value={
-                                            reviewRating[
-                                                product.id
-                                            ] || ""
-                                        }
-                                        onChange={e =>
-                                            setReviewRating(
-                                                previous => ({
-                                                    ...previous,
-                                                    [product.id]:
-                                                        e.target.value
-                                                })
-                                            )
-                                        }
-                                        style={
-                                            styles.ratingSelect
-                                        }
-                                    >
-
-                                        <option value="">
-                                            Select Rating
-                                        </option>
-
-                                        <option value="1">
-                                            ⭐ 1
-                                        </option>
-
-                                        <option value="2">
-                                            ⭐⭐ 2
-                                        </option>
-
-                                        <option value="3">
-                                            ⭐⭐⭐ 3
-                                        </option>
-
-                                        <option value="4">
-                                            ⭐⭐⭐⭐ 4
-                                        </option>
-
-                                        <option value="5">
-                                            ⭐⭐⭐⭐⭐ 5
-                                        </option>
-
-                                    </select>
-
-
-                                    <textarea
-                                        placeholder="Write your review..."
-                                        value={
-                                            reviewComment[
-                                                product.id
-                                            ] || ""
-                                        }
-                                        onChange={e =>
-                                            setReviewComment(
-                                                previous => ({
-                                                    ...previous,
-                                                    [product.id]:
-                                                        e.target.value
-                                                })
-                                            )
-                                        }
-                                        style={
-                                            styles.commentBox
-                                        }
-                                    />
-
-
-                                    <button
-                                        style={
-                                            styles.submitReviewButton
-                                        }
-                                        onClick={() =>
-                                            submitReview(
-                                                product.id
-                                            )
-                                        }
-                                    >
-                                        Submit Review
-                                    </button>
-
-
-                                    {reviewMessage[
-                                        product.id
-                                    ] && (
-
-                                        <p
-                                            style={
-                                                styles.message
-                                            }
-                                        >
-                                            {
-                                                reviewMessage[
-                                                    product.id
-                                                ]
-                                            }
-                                        </p>
-
-                                    )}
-
-                                </div>
-
-                            ) : (
-
-                                <div
-                                    style={
-                                        styles.reviewLocked
-                                    }
-                                >
-
-                                    🔒{" "}
-                                    <b>
-                                        Review Locked
-                                    </b>
-
-                                    <p>
-                                        Purchase and receive
-                                        this product first
-                                        to give a rating
-                                        and review.
-                                    </p>
-
-                                </div>
-
-                            )}
-
-                        </div>
-
-                    </div>
-
-                ))}
+            {/* SEARCH */}
+
+            <div
+                style={
+                    styles.searchBox
+                }
+            >
+
+                <input
+                    type="text"
+                    placeholder="Search products..."
+                    value={search}
+                    onChange={(e) =>
+                        setSearch(
+                            e.target.value
+                        )
+                    }
+                    style={styles.input}
+                />
+
+
+                <select
+                    value={category}
+                    onChange={(e) =>
+                        setCategory(
+                            e.target.value
+                        )
+                    }
+                    style={styles.input}
+                >
+
+                    {categories.map(
+                        cat => (
+
+                            <option
+                                key={cat}
+                                value={cat}
+                            >
+                                {cat}
+                            </option>
+
+                        )
+                    )}
+
+                </select>
 
             </div>
 
 
-            {/* ORDER HISTORY */}
+            {/* PRODUCT GRID */}
 
-            <section style={styles.ordersSection}>
+            <div
+                style={
+                    styles.productGrid
+                }
+            >
 
-                <h2>
-                    📦 My Orders
-                </h2>
-
-
-                {orders.length === 0 ? (
+                {filteredProducts.length ===
+                0 ? (
 
                     <p>
-                        You have no orders yet.
+                        No products found.
                     </p>
 
                 ) : (
 
-                    orders.map(order => (
-
-                        <div
-                            key={order.id}
-                            style={styles.orderCard}
-                        >
-
-                            <h3>
-                                Order #{order.id}
-                            </h3>
-
-
-                            <p>
-                                Total: ₹
-                                {order.totalAmount}
-                            </p>
-
-
-                            <p>
-                                Status:{" "}
-                                <b>
-                                    {order.status}
-                                </b>
-                            </p>
-
-
-                            <p>
-                                Order Date:{" "}
-                                {order.orderDate}
-                            </p>
-
-
-                            {order.status ===
-                                "CONFIRMED" && (
-
-                                <div>
-
-                                    <p>
-                                        🚚 Your order has
-                                        been confirmed.
-                                        <br />
-
-                                        Once you receive
-                                        the product, click
-                                        the button below.
-                                    </p>
-
-
-                                    <button
-                                        style={
-                                            styles.receiveButton
-                                        }
-                                        onClick={() =>
-                                            markOrderReceived(
-                                                order.id
-                                            )
-                                        }
-                                    >
-                                        📦 I Received This
-                                        Order
-                                    </button>
-
-                                </div>
-
-                            )}
-
-
-                            {order.status ===
-                                "RECEIVED" && (
-
-                                <div
-                                    style={
-                                        styles.receivedMessage
-                                    }
-                                >
-
-                                    ✅ Order Received
-
-                                    <p>
-                                        You can now give
-                                        a rating and review
-                                        for the products
-                                        you purchased.
-                                    </p>
-
-                                </div>
-
-                            )}
-
-                        </div>
-
-                    ))
-
-                )}
-
-            </section>
-
-
-            {/* CART SUMMARY */}
-
-            <section style={styles.cartSummary}>
-
-                <h2>
-                    🛒 Cart Summary
-                </h2>
-
-
-                {cart.length === 0 ? (
-
-                    <p>
-                        Your cart is empty.
-                    </p>
-
-                ) : (
-
-                    <>
-
-                        {cart.map(item => (
+                    filteredProducts.map(
+                        product => (
 
                             <div
-                                key={item.id}
+                                key={
+                                    product.id
+                                }
                                 style={
-                                    styles.cartItem
+                                    styles.productCard
                                 }
                             >
 
-                                <span>
-                                    Product ID:{" "}
-                                    {item.productId}
-                                </span>
+                                {/* IMAGE */}
 
+                                {product.imageUrl && (
 
-                                <div>
-
-                                    <button
-                                        onClick={() =>
-                                            updateQuantity(
-                                                item.id,
-                                                item.quantity - 1
-                                            )
+                                    <img
+                                        src={
+                                            product.imageUrl
                                         }
-                                    >
-                                        -
-                                    </button>
-
-
-                                    <span
-                                        style={{
-                                            margin:
-                                                "0 10px"
-                                        }}
-                                    >
-                                        {item.quantity}
-                                    </span>
-
-
-                                    <button
-                                        onClick={() =>
-                                            updateQuantity(
-                                                item.id,
-                                                item.quantity + 1
-                                            )
-                                        }
-                                    >
-                                        +
-                                    </button>
-
-
-                                    <button
-                                        onClick={() =>
-                                            removeFromCart(
-                                                item.id
-                                            )
+                                        alt={
+                                            product.name
                                         }
                                         style={
-                                            styles.removeButton
+                                            styles.productImage
+                                        }
+                                        onError={(e) => {
+                                            e.target.style.display =
+                                                "none";
+                                        }}
+                                    />
+
+                                )}
+
+
+                                <h3>
+                                    {
+                                        product.name
+                                    }
+                                </h3>
+
+
+                                <p>
+                                    {
+                                        product.description
+                                    }
+                                </p>
+
+
+                                <p>
+                                    <b>
+                                        Category:
+                                    </b>{" "}
+                                    {
+                                        product.category
+                                    }
+                                </p>
+
+
+                                <p>
+                                    <b>
+                                        Price:
+                                    </b>{" "}
+                                    ₹
+                                    {
+                                        product.price
+                                    }
+                                </p>
+
+
+                                <p>
+                                    <b>
+                                        Stock:
+                                    </b>{" "}
+                                    {
+                                        product.stockQuantity
+                                    }
+                                </p>
+
+
+                                {/* ADD TO CART */}
+
+                                <button
+                                    style={
+                                        styles.button
+                                    }
+                                    onClick={() =>
+                                        addToCart(
+                                            product
+                                        )
+                                    }
+                                    disabled={
+                                        product.stockQuantity <=
+                                        0
+                                    }
+                                >
+
+                                    {
+                                        product.stockQuantity <=
+                                        0
+                                            ? "Out of Stock"
+                                            : "Add to Cart"
+                                    }
+
+                                </button>
+
+
+                                {/* REVIEWS */}
+
+                                <hr />
+
+                                <h3>
+                                    ⭐ Customer Reviews
+                                </h3>
+
+
+                                {reviews[
+                                    product.id
+                                ] &&
+                                reviews[
+                                    product.id
+                                ].length >
+                                    0 ? (
+
+                                    reviews[
+                                        product.id
+                                    ].map(
+                                        review => (
+
+                                            <div
+                                                key={
+                                                    review.id
+                                                }
+                                                style={
+                                                    styles.reviewBox
+                                                }
+                                            >
+
+                                                <p>
+
+                                                    <b>
+                                                        Rating:
+                                                    </b>{" "}
+
+                                                    {"⭐".repeat(
+                                                        review.rating
+                                                    )}
+
+                                                </p>
+
+
+                                                <p>
+                                                    {
+                                                        review.comment
+                                                    }
+                                                </p>
+
+
+                                                {review.customerId ===
+                                                    customerId && (
+
+                                                    <div>
+
+                                                        <button
+                                                            style={
+                                                                styles.smallButton
+                                                            }
+                                                            onClick={() =>
+                                                                updateReview(
+                                                                    review
+                                                                )
+                                                            }
+                                                        >
+                                                            Edit
+                                                        </button>
+
+
+                                                        <button
+                                                            style={
+                                                                styles.deleteButton
+                                                            }
+                                                            onClick={() =>
+                                                                deleteReview(
+                                                                    review
+                                                                )
+                                                            }
+                                                        >
+                                                            Delete
+                                                        </button>
+
+                                                    </div>
+
+                                                )}
+
+                                            </div>
+
+                                        )
+                                    )
+
+                                ) : (
+
+                                    <p>
+                                        No reviews yet.
+                                    </p>
+
+                                )}
+
+
+                                {/* REVIEW FORM */}
+
+                                {canReview[
+                                    product.id
+                                ] ? (
+
+                                    <div
+                                        style={
+                                            styles.reviewForm
                                         }
                                     >
-                                        Remove
-                                    </button>
 
-                                </div>
+                                        <h4>
+                                            ⭐ Give your review
+                                        </h4>
+
+
+                                        <div>
+
+                                            {[1,2,3,4,5].map(
+                                                star => (
+
+                                                    <button
+                                                        key={
+                                                            star
+                                                        }
+                                                        onClick={() =>
+                                                            setReviewRating(
+                                                                prev => ({
+                                                                    ...prev,
+                                                                    [product.id]:
+                                                                        star
+                                                                })
+                                                            )
+                                                        }
+                                                        style={{
+                                                            ...styles.starButton,
+                                                            color:
+                                                                star <=
+                                                                (
+                                                                    reviewRating[
+                                                                        product.id
+                                                                    ] ||
+                                                                    0
+                                                                )
+                                                                    ? "gold"
+                                                                    : "gray"
+                                                        }}
+                                                    >
+                                                        ★
+                                                    </button>
+
+                                                )
+                                            )}
+
+                                        </div>
+
+
+                                        <textarea
+                                            placeholder="Write your review..."
+                                            value={
+                                                reviewComment[
+                                                    product.id
+                                                ] || ""
+                                            }
+                                            onChange={(e) =>
+                                                setReviewComment(
+                                                    prev => ({
+                                                        ...prev,
+                                                        [product.id]:
+                                                            e.target.value
+                                                    })
+                                                )
+                                            }
+                                            style={
+                                                styles.textarea
+                                            }
+                                        />
+
+
+                                        <button
+                                            style={
+                                                styles.button
+                                            }
+                                            onClick={() =>
+                                                submitReview(
+                                                    product.id
+                                                )
+                                            }
+                                        >
+                                            Submit Review
+                                        </button>
+
+
+                                        {reviewMessage[
+                                            product.id
+                                        ] && (
+
+                                            <p
+                                                style={
+                                                    styles.reviewMessage
+                                                }
+                                            >
+                                                {
+                                                    reviewMessage[
+                                                        product.id
+                                                    ]
+                                                }
+                                            </p>
+
+                                        )}
+
+                                    </div>
+
+                                ) : (
+
+                                    <div
+                                        style={
+                                            styles.reviewLocked
+                                        }
+                                    >
+
+                                        🔒{" "}
+
+                                        <b>
+                                            Review locked
+                                        </b>
+
+                                        <p>
+                                            Purchase and
+                                            receive this
+                                            product first
+                                            to give a
+                                            rating and
+                                            review.
+                                        </p>
+
+                                    </div>
+
+                                )}
 
                             </div>
 
-                        ))}
-
-
-                        <h3>
-                            Total: ₹
-                            {getTotal()}
-                        </h3>
-
-
-                        <button
-                            style={
-                                styles.goCartButton
-                            }
-                            onClick={() =>
-                                window.location.href =
-                                    "/cart"
-                            }
-                        >
-                            Go To Cart / Checkout
-                        </button>
-
-                    </>
+                        )
+                    )
 
                 )}
 
-            </section>
+            </div>
 
         </div>
+
     );
+
 }
 
 
-// =========================================================
+// =====================================================
 // STYLES
-// =========================================================
+// =====================================================
 
 const styles = {
 
-    page: {
-        padding: "20px",
-        fontFamily: "Arial, sans-serif",
+    container: {
+        padding: "30px",
+        fontFamily:
+            "Arial, sans-serif",
         backgroundColor: "#f5f5f5",
         minHeight: "100vh"
     },
 
-    loading: {
-        padding: "50px",
-        textAlign: "center",
-        fontSize: "22px"
-    },
 
     header: {
         display: "flex",
-        justifyContent: "space-between",
+        justifyContent:
+            "space-between",
         alignItems: "center",
-        padding: "20px",
         backgroundColor: "white",
+        padding: "20px",
         borderRadius: "10px",
-        marginBottom: "20px"
+        marginBottom: "25px",
+        flexWrap: "wrap",
+        gap: "15px"
     },
 
-    cartButton: {
+
+    navButton: {
+        backgroundColor: "#007bff",
+        color: "white",
+        border: "none",
         padding: "10px 15px",
-        marginRight: "10px",
-        cursor: "pointer"
+        borderRadius: "5px",
+        cursor: "pointer",
+        margin: "5px"
     },
+
+
+    orderButton: {
+        backgroundColor: "#6f42c1",
+        color: "white",
+        border: "none",
+        padding: "10px 15px",
+        borderRadius: "5px",
+        cursor: "pointer",
+        margin: "5px"
+    },
+
 
     logoutButton: {
+        backgroundColor: "#dc3545",
+        color: "white",
+        border: "none",
         padding: "10px 15px",
-        cursor: "pointer"
+        borderRadius: "5px",
+        cursor: "pointer",
+        margin: "5px"
     },
 
-    searchSection: {
+
+    center: {
+        textAlign: "center",
+        padding: "50px"
+    },
+
+
+    message: {
+        padding: "10px",
+        backgroundColor: "#fff3cd",
+        borderRadius: "5px",
+        marginBottom: "15px"
+    },
+
+
+    searchBox: {
         display: "flex",
         gap: "10px",
-        marginBottom: "25px"
+        marginBottom: "25px",
+        flexWrap: "wrap"
     },
 
-    searchInput: {
-        padding: "12px",
-        width: "60%",
-        fontSize: "16px"
+
+    input: {
+        padding: "10px",
+        borderRadius: "5px",
+        border: "1px solid #ccc",
+        minWidth: "200px"
     },
 
-    categorySelect: {
-        padding: "12px",
-        fontSize: "16px"
-    },
 
     productGrid: {
         display: "grid",
         gridTemplateColumns:
-            "repeat(auto-fill, minmax(300px, 1fr))",
+            "repeat(auto-fit, minmax(280px, 1fr))",
         gap: "20px"
     },
+
 
     productCard: {
         backgroundColor: "white",
@@ -1608,131 +1458,104 @@ const styles = {
             "0 2px 8px rgba(0,0,0,0.1)"
     },
 
+
     productImage: {
         width: "100%",
-        height: "200px",
+        height: "180px",
         objectFit: "cover",
-        borderRadius: "8px"
-    },
-
-    addButton: {
-        padding: "10px 15px",
-        cursor: "pointer",
-        width: "100%"
-    },
-
-    reviewSection: {
-        marginTop: "20px",
-        borderTop: "1px solid #ddd",
-        paddingTop: "15px"
-    },
-
-    reviewCard: {
-        backgroundColor: "#f9f9f9",
-        padding: "10px",
-        marginBottom: "10px",
-        borderRadius: "6px"
-    },
-
-    reviewForm: {
-        marginTop: "15px",
-        padding: "15px",
-        backgroundColor: "#eef8ff",
-        borderRadius: "8px"
-    },
-
-    reviewLocked: {
-        marginTop: "15px",
-        padding: "15px",
-        backgroundColor: "#f1f1f1",
-        borderRadius: "8px"
-    },
-
-    ratingSelect: {
-        padding: "8px",
-        marginBottom: "10px",
-        width: "100%"
-    },
-
-    commentBox: {
-        width: "100%",
-        minHeight: "80px",
-        padding: "8px",
-        boxSizing: "border-box",
+        borderRadius: "8px",
         marginBottom: "10px"
     },
 
-    submitReviewButton: {
+
+    button: {
+        backgroundColor: "#007bff",
+        color: "white",
+        border: "none",
         padding: "10px 15px",
-        cursor: "pointer"
+        borderRadius: "5px",
+        cursor: "pointer",
+        marginTop: "8px"
     },
 
-    editButton: {
-        marginRight: "8px",
-        padding: "5px 10px",
-        cursor: "pointer"
+
+    reviewBox: {
+        backgroundColor: "#f8f9fa",
+        padding: "10px",
+        marginTop: "10px",
+        borderRadius: "5px",
+        border: "1px solid #ddd"
     },
+
+
+    reviewForm: {
+        marginTop: "15px",
+        padding: "10px",
+        backgroundColor: "#fff",
+        borderRadius: "5px"
+    },
+
+
+    reviewLocked: {
+        marginTop: "15px",
+        padding: "12px",
+        backgroundColor: "#fff3cd",
+        border:
+            "1px solid #ffe69c",
+        borderRadius: "5px",
+        color: "#856404"
+    },
+
+
+    reviewMessage: {
+        marginTop: "10px",
+        fontWeight: "bold"
+    },
+
+
+    starButton: {
+        background: "none",
+        border: "none",
+        fontSize: "28px",
+        cursor: "pointer",
+        padding: "2px"
+    },
+
+
+    textarea: {
+        width: "100%",
+        minHeight: "70px",
+        marginTop: "10px",
+        padding: "8px",
+        borderRadius: "5px",
+        border:
+            "1px solid #ccc",
+        boxSizing: "border-box"
+    },
+
+
+    smallButton: {
+        padding: "6px 12px",
+        margin: "5px",
+        border: "none",
+        borderRadius: "4px",
+        cursor: "pointer",
+        backgroundColor: "#007bff",
+        color: "white"
+    },
+
 
     deleteButton: {
-        padding: "5px 10px",
-        cursor: "pointer"
-    },
-
-    message: {
-        fontWeight: "bold"
-    },
-
-    ordersSection: {
-        marginTop: "40px"
-    },
-
-    orderCard: {
-        backgroundColor: "white",
-        padding: "20px",
-        marginBottom: "15px",
-        borderRadius: "10px",
-        boxShadow:
-            "0 2px 6px rgba(0,0,0,0.1)"
-    },
-
-    receiveButton: {
-        padding: "12px 18px",
+        padding: "6px 12px",
+        margin: "5px",
+        border: "none",
+        borderRadius: "4px",
         cursor: "pointer",
-        fontWeight: "bold"
-    },
-
-    receivedMessage: {
-        backgroundColor: "#e8f5e9",
-        padding: "12px",
-        borderRadius: "8px"
-    },
-
-    cartSummary: {
-        marginTop: "40px",
-        backgroundColor: "white",
-        padding: "20px",
-        borderRadius: "10px"
-    },
-
-    cartItem: {
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "10px",
-        borderBottom: "1px solid #ddd"
-    },
-
-    removeButton: {
-        marginLeft: "15px",
-        padding: "5px 10px",
-        cursor: "pointer"
-    },
-
-    goCartButton: {
-        padding: "12px 20px",
-        cursor: "pointer",
-        fontWeight: "bold"
+        backgroundColor: "#dc3545",
+        color: "white"
     }
+
 };
+
 
 export default CustomerDashboard;

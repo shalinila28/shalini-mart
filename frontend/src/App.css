@@ -1,184 +1,1957 @@
-.counter {
-  font-size: 16px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 2px solid transparent;
-  transition: border-color 0.3s;
-  margin-bottom: 24px;
+/* =========================================================
+   SHALINIMART GLOBAL DESIGN
+========================================================= */
 
-  &:hover {
-    border-color: var(--accent-border);
-  }
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
+* {
+    box-sizing: border-box;
 }
 
-.hero {
-  position: relative;
+html,
+body,
+#root {
+    margin: 0;
 
-  .base,
-  .framework,
-  .vite {
-    inset-inline: 0;
-    margin: 0 auto;
-  }
+    min-height: 100%;
 
-  .base {
-    width: 170px;
-    position: relative;
-    z-index: 0;
-  }
-
-  .framework,
-  .vite {
-    position: absolute;
-  }
-
-  .framework {
-    z-index: 1;
-    top: 34px;
-    height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
-  }
-
-  .vite {
-    z-index: 0;
-    top: 107px;
-    height: 26px;
-    width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
-  }
+    font-family:
+        "Segoe UI",
+        Arial,
+        sans-serif;
 }
 
-#center {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-  place-content: center;
-  place-items: center;
-  flex-grow: 1;
 
-  @media (max-width: 1024px) {
-    padding: 32px 20px 24px;
-    gap: 18px;
-  }
+body {
+    background: #f1f5f9;
+
+    color: #172033;
 }
 
-#next-steps {
-  display: flex;
-  border-top: 1px solid var(--border);
-  text-align: left;
 
-  & > div {
-    flex: 1 1 0;
-    padding: 32px;
-    @media (max-width: 1024px) {
-      padding: 24px 20px;
-    }
-  }
+/* =========================================================
+   AUTH PAGE
+   LOGIN / REGISTER
+========================================================= */
 
-  .icon {
-    margin-bottom: 16px;
-    width: 22px;
-    height: 22px;
-  }
+.auth-page {
+    min-height: 100vh;
 
-  @media (max-width: 1024px) {
-    flex-direction: column;
-    text-align: center;
-  }
-}
-
-#docs {
-  border-right: 1px solid var(--border);
-
-  @media (max-width: 1024px) {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
-}
-
-#next-steps ul {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  gap: 8px;
-  margin: 32px 0 0;
-
-  .logo {
-    height: 18px;
-  }
-
-  a {
-    color: var(--text-h);
-    font-size: 16px;
-    border-radius: 6px;
-    background: var(--social-bg);
     display: flex;
-    padding: 6px 12px;
+
     align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: box-shadow 0.3s;
 
-    &:hover {
-      box-shadow: var(--shadow);
-    }
-    .button-icon {
-      height: 18px;
-      width: 18px;
-    }
-  }
-
-  @media (max-width: 1024px) {
-    margin-top: 20px;
-    flex-wrap: wrap;
     justify-content: center;
 
-    li {
-      flex: 1 1 calc(50% - 8px);
-    }
+    padding: 25px;
 
-    a {
-      width: 100%;
-      justify-content: center;
-      box-sizing: border-box;
-    }
-  }
+    background:
+        radial-gradient(
+            circle at top left,
+            #312e81,
+            transparent 35%
+        ),
+        radial-gradient(
+            circle at bottom right,
+            #2563eb,
+            transparent 35%
+        ),
+        #0f172a;
 }
 
-#spacer {
-  height: 88px;
-  border-top: 1px solid var(--border);
-  @media (max-width: 1024px) {
-    height: 48px;
-  }
+
+.auth-card {
+    width: 100%;
+
+    max-width: 450px;
+
+    padding: 40px;
+
+    border-radius: 25px;
+
+    background: rgba(255,255,255,0.97);
+
+    box-shadow:
+        0 25px 70px rgba(0,0,0,0.35);
+
+    color: #111827;
 }
 
-.ticks {
-  position: relative;
-  width: 100%;
 
-  &::before,
-  &::after {
-    content: '';
+.auth-logo {
+    text-align: center;
+
+    font-size: 45px;
+
+    margin-bottom: 5px;
+}
+
+
+.auth-title {
+    text-align: center;
+
+    font-size: 30px;
+
+    font-weight: 900;
+
+    color: #312e81;
+
+    margin-bottom: 5px;
+}
+
+
+.auth-subtitle {
+    text-align: center;
+
+    color: #64748b;
+
+    margin-bottom: 28px;
+}
+
+
+.auth-card label {
+    display: block;
+
+    color: #1e293b;
+
+    font-weight: 700;
+
+    margin-bottom: 7px;
+}
+
+
+.auth-card input,
+.auth-card select {
+    width: 100%;
+
+    padding: 14px;
+
+    border: 2px solid #cbd5e1;
+
+    border-radius: 11px;
+
+    margin-bottom: 17px;
+
+    color: #111827;
+
+    background: white;
+
+    font-size: 15px;
+
+    outline: none;
+}
+
+
+.auth-card input:focus,
+.auth-card select:focus {
+    border-color: #4f46e5;
+
+    box-shadow:
+        0 0 0 4px rgba(79,70,229,0.10);
+}
+
+
+.auth-button {
+    width: 100%;
+
+    padding: 14px;
+
+    border: none;
+
+    border-radius: 11px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #4f46e5,
+            #2563eb
+        );
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition: 0.25s;
+}
+
+
+.auth-button:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 20px rgba(37,99,235,0.30);
+}
+
+
+.auth-link {
+    color: #4338ca;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    text-decoration: none;
+}
+
+
+.auth-link:hover {
+    color: #2563eb;
+
+    text-decoration: underline;
+}
+
+
+/* =========================================================
+   HOME PAGE
+========================================================= */
+
+.home-page {
+    min-height: 100vh;
+
+    background:
+        linear-gradient(
+            135deg,
+            #eef2ff,
+            #eff6ff,
+            #f8fafc
+        );
+
+    color: #111827;
+}
+
+
+.home-header {
+    padding: 20px 40px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #111827,
+            #1e1b4b,
+            #312e81
+        );
+
+    color: white;
+
+    box-shadow:
+        0 8px 30px rgba(15,23,42,0.25);
+}
+
+
+.home-logo {
+    font-size: 30px;
+
+    font-weight: 900;
+
+    color: white;
+}
+
+
+.home-buttons {
+    display: flex;
+
+    gap: 12px;
+}
+
+
+.home-button {
+    border: none;
+
+    padding: 11px 20px;
+
+    border-radius: 10px;
+
+    font-weight: 800;
+
+    cursor: pointer;
+}
+
+
+.home-login {
+    background: white;
+
+    color: #312e81;
+}
+
+
+.home-register {
+    background:
+        linear-gradient(
+            135deg,
+            #6366f1,
+            #2563eb
+        );
+
+    color: white;
+}
+
+
+.hero-section {
+    min-height: 500px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    padding: 50px 25px;
+}
+
+
+.hero-content {
+    max-width: 850px;
+}
+
+
+.hero-title {
+    font-size: 55px;
+
+    font-weight: 900;
+
+    color: #111827;
+
+    margin-bottom: 15px;
+}
+
+
+.hero-highlight {
+    color: #4f46e5;
+}
+
+
+.hero-text {
+    font-size: 19px;
+
+    line-height: 1.7;
+
+    color: #475569;
+
+    margin-bottom: 30px;
+}
+
+
+.hero-button {
+    border: none;
+
+    padding: 15px 30px;
+
+    border-radius: 12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #4f46e5,
+            #2563eb
+        );
+
+    color: white;
+
+    font-size: 17px;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 25px rgba(37,99,235,0.25);
+}
+
+
+/* =========================================================
+   COMMON CARD
+========================================================= */
+
+.common-card {
+    background: white;
+
+    color: #172033;
+
+    border-radius: 20px;
+
+    padding: 25px;
+
+    border: 1px solid #dbeafe;
+
+    box-shadow:
+        0 8px 25px rgba(15,23,42,0.08);
+}
+
+
+/* =========================================================
+   COMMON HEADING
+========================================================= */
+
+h1,
+h2,
+h3 {
+    color: #111827;
+}
+
+
+p {
+    color: #475569;
+}
+/* =========================================================
+   SHALINIMART WELCOME PAGE
+========================================================= */
+
+.welcome-page {
+    min-height: 100vh;
+
+    background:
+        radial-gradient(
+            circle at 10% 10%,
+            #ddd6fe 0%,
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 90% 20%,
+            #bfdbfe 0%,
+            transparent 28%
+        ),
+        #f8fafc;
+
+    color: #111827;
+}
+
+
+/* =========================================================
+   NAVBAR
+========================================================= */
+
+.welcome-navbar {
+    height: 82px;
+
+    padding: 12px 6%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    background:
+        linear-gradient(
+            135deg,
+            #0f172a,
+            #1e1b4b,
+            #312e81
+        );
+
+    color: white;
+
+    box-shadow:
+        0 8px 30px rgba(15,23,42,0.25);
+}
+
+
+.welcome-logo {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    cursor: pointer;
+}
+
+
+.welcome-logo-icon {
+    width: 50px;
+    height: 50px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: white;
+
+    border-radius: 14px;
+
+    font-size: 28px;
+}
+
+
+.welcome-logo-name {
+    font-size: 25px;
+
+    font-weight: 900;
+
+    color: white;
+}
+
+
+.welcome-logo-tagline {
+    color: #c7d2fe;
+
+    font-size: 12px;
+}
+
+
+.welcome-nav-buttons {
+    display: flex;
+
+    gap: 12px;
+}
+
+
+.welcome-login-btn,
+.welcome-register-btn {
+    padding: 11px 20px;
+
+    border-radius: 10px;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition: 0.25s;
+}
+
+
+.welcome-login-btn {
+    background: white;
+
+    color: #312e81;
+
+    border: 2px solid white;
+}
+
+
+.welcome-register-btn {
+    background:
+        linear-gradient(
+            135deg,
+            #6366f1,
+            #2563eb
+        );
+
+    color: white;
+
+    border: none;
+}
+
+
+.welcome-login-btn:hover,
+.welcome-register-btn:hover {
+    transform: translateY(-2px);
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.welcome-hero {
+    min-height: 620px;
+
+    max-width: 1300px;
+
+    margin: auto;
+
+    padding: 70px 35px;
+
+    display: grid;
+
+    grid-template-columns: 1.05fr 0.95fr;
+
+    gap: 50px;
+
+    align-items: center;
+}
+
+
+.welcome-hero-content {
+    max-width: 650px;
+}
+
+
+.welcome-badge {
+    display: inline-block;
+
+    padding: 9px 15px;
+
+    border-radius: 25px;
+
+    background: #e0e7ff;
+
+    color: #3730a3;
+
+    font-weight: 800;
+
+    font-size: 14px;
+
+    margin-bottom: 20px;
+}
+
+
+.welcome-hero h1 {
+    font-size: clamp(45px, 6vw, 75px);
+
+    line-height: 1.02;
+
+    margin: 0;
+
+    font-weight: 950;
+
+    color: #111827;
+
+    letter-spacing: -2px;
+}
+
+
+.welcome-hero h1 span {
+    background:
+        linear-gradient(
+            135deg,
+            #4f46e5,
+            #2563eb,
+            #0891b2
+        );
+
+    -webkit-background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+}
+
+
+.welcome-hero-content > p {
+    font-size: 18px;
+
+    line-height: 1.8;
+
+    color: #475569;
+
+    max-width: 600px;
+
+    margin: 25px 0;
+}
+
+
+.welcome-hero-buttons {
+    display: flex;
+
+    gap: 14px;
+
+    flex-wrap: wrap;
+}
+
+
+.welcome-start-btn {
+    border: none;
+
+    padding: 15px 25px;
+
+    border-radius: 12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #4f46e5,
+            #2563eb
+        );
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 10px 25px rgba(37,99,235,0.25);
+}
+
+
+.welcome-existing-btn {
+    border: 2px solid #cbd5e1;
+
+    padding: 13px 20px;
+
+    border-radius: 12px;
+
+    background: white;
+
+    color: #334155;
+
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   MINI FEATURES
+========================================================= */
+
+.welcome-mini-features {
+    display: flex;
+
+    gap: 25px;
+
+    margin-top: 35px;
+
+    flex-wrap: wrap;
+}
+
+
+.welcome-mini-features div {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    color: #334155;
+}
+
+
+.welcome-mini-features span {
+    font-size: 20px;
+}
+
+
+.welcome-mini-features strong {
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   RIGHT VISUAL
+========================================================= */
+
+.welcome-visual {
+    position: relative;
+
+    min-height: 500px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+
+.shopping-card {
+    width: 370px;
+
+    min-height: 410px;
+
+    padding: 30px;
+
+    border-radius: 35px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #1e1b4b,
+            #312e81,
+            #2563eb
+        );
+
+    color: white;
+
+    box-shadow:
+        0 30px 70px rgba(37,99,235,0.30);
+
+    transform: rotate(2deg);
+}
+
+
+.shopping-card-top {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    font-size: 23px;
+}
+
+
+.online-dot {
+    font-size: 12px;
+
+    color: #86efac;
+}
+
+
+.shopping-bag {
+    width: 110px;
+    height: 110px;
+
+    margin: 35px auto 25px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 30px;
+
+    background:
+        rgba(255,255,255,0.14);
+
+    font-size: 55px;
+
+    box-shadow:
+        inset 0 0 30px rgba(255,255,255,0.08);
+}
+
+
+.shopping-card h2 {
+    color: white;
+
+    font-size: 30px;
+
+    line-height: 1.2;
+
+    margin: 0;
+}
+
+
+.shopping-card p {
+    color: #c7d2fe;
+
+    margin-top: 10px;
+}
+
+
+.fake-products {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 10px;
+
+    margin-top: 30px;
+}
+
+
+.fake-products div {
+    height: 55px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background:
+        rgba(255,255,255,0.13);
+
+    font-size: 25px;
+}
+
+
+/* =========================================================
+   FLOATING CARDS
+========================================================= */
+
+.floating-card {
     position: absolute;
-    top: -4.5px;
-    border: 5px solid transparent;
-  }
 
-  &::before {
-    left: 0;
-    border-left-color: var(--border);
-  }
-  &::after {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 13px 16px;
+
+    border-radius: 15px;
+
+    background: white;
+
+    color: #111827;
+
+    box-shadow:
+        0 15px 40px rgba(15,23,42,0.15);
+}
+
+
+.floating-card > span {
+    font-size: 25px;
+}
+
+
+.floating-card strong {
+    display: block;
+
+    font-size: 13px;
+}
+
+
+.floating-card small {
+    color: #64748b;
+
+    font-size: 11px;
+}
+
+
+.floating-one {
+    top: 70px;
+
     right: 0;
-    border-right-color: var(--border);
-  }
+}
+
+
+.floating-two {
+    bottom: 65px;
+
+    left: 0;
+}
+
+
+/* =========================================================
+   FEATURES
+========================================================= */
+
+.welcome-features {
+    padding: 75px 6%;
+
+    background: white;
+}
+
+
+.welcome-section-heading {
+    text-align: center;
+
+    margin-bottom: 40px;
+}
+
+
+.welcome-section-heading span {
+    color: #4f46e5;
+
+    font-size: 13px;
+
+    font-weight: 900;
+
+    letter-spacing: 2px;
+}
+
+
+.welcome-section-heading h2 {
+    color: #111827;
+
+    font-size: 38px;
+
+    line-height: 1.2;
+}
+
+
+.welcome-feature-grid {
+    max-width: 1250px;
+
+    margin: auto;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 20px;
+}
+
+
+.welcome-feature-card {
+    padding: 25px;
+
+    border-radius: 18px;
+
+    background: #f8fafc;
+
+    border: 1px solid #e2e8f0;
+
+    transition: 0.25s;
+}
+
+
+.welcome-feature-card:hover {
+    transform: translateY(-5px);
+
+    background: white;
+
+    box-shadow:
+        0 15px 35px rgba(15,23,42,0.10);
+}
+
+
+.feature-icon {
+    width: 55px;
+    height: 55px;
+
+    border-radius: 15px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 28px;
+
+    margin-bottom: 15px;
+}
+
+
+.feature-icon.blue {
+    background: #dbeafe;
+}
+
+
+.feature-icon.purple {
+    background: #ede9fe;
+}
+
+
+.feature-icon.green {
+    background: #dcfce7;
+}
+
+
+.feature-icon.orange {
+    background: #ffedd5;
+}
+
+
+.welcome-feature-card h3 {
+    color: #111827;
+
+    margin-bottom: 8px;
+}
+
+
+.welcome-feature-card p {
+    color: #475569;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   CTA
+========================================================= */
+
+.welcome-cta {
+    max-width: 1200px;
+
+    margin: 60px auto;
+
+    padding: 45px;
+
+    border-radius: 25px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 25px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #312e81,
+            #4f46e5,
+            #2563eb
+        );
+
+    color: white;
+}
+
+
+.welcome-cta h2 {
+    color: white;
+
+    font-size: 30px;
+
+    margin: 0 0 8px;
+}
+
+
+.welcome-cta p {
+    color: #dbeafe;
+
+    margin: 0;
+}
+
+
+.welcome-cta button {
+    border: none;
+
+    padding: 14px 23px;
+
+    border-radius: 11px;
+
+    background: white;
+
+    color: #312e81;
+
+    font-weight: 900;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.welcome-footer {
+    padding: 30px 6%;
+
+    background: #0f172a;
+
+    color: white;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+}
+
+
+.welcome-footer strong {
+    color: white;
+}
+
+
+.welcome-footer p {
+    color: #94a3b8;
+
+    margin: 0;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .welcome-hero {
+        grid-template-columns: 1fr;
+
+        text-align: center;
+    }
+
+
+    .welcome-hero-content {
+        margin: auto;
+    }
+
+
+    .welcome-hero-buttons,
+    .welcome-mini-features {
+        justify-content: center;
+    }
+
+
+    .welcome-visual {
+        min-height: 480px;
+    }
+
+
+    .welcome-feature-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+
+    .welcome-cta {
+        margin: 30px 20px;
+
+        flex-direction: column;
+
+        text-align: center;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .welcome-navbar {
+        height: auto;
+
+        padding: 15px 20px;
+
+        gap: 15px;
+
+        flex-direction: column;
+    }
+
+
+    .welcome-nav-buttons {
+        width: 100%;
+    }
+
+
+    .welcome-login-btn,
+    .welcome-register-btn {
+        flex: 1;
+    }
+
+
+    .welcome-hero {
+        padding: 50px 20px;
+    }
+
+
+    .welcome-hero h1 {
+        font-size: 45px;
+    }
+
+
+    .shopping-card {
+        width: 300px;
+    }
+
+
+    .floating-one {
+        right: -5px;
+    }
+
+
+    .floating-two {
+        left: -5px;
+    }
+
+
+    .welcome-feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .welcome-footer {
+        flex-direction: column;
+
+        gap: 10px;
+
+        text-align: center;
+    }
+
+}
+/* =========================================================
+   SHALINIMART LOGIN + REGISTER
+========================================================= */
+
+.auth-page {
+    min-height: 100vh;
+
+    background:
+        radial-gradient(
+            circle at 10% 10%,
+            #c7d2fe,
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 90% 20%,
+            #bfdbfe,
+            transparent 28%
+        ),
+        #f1f5f9;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 50px 25px;
+
+    position: relative;
+
+    font-family: Arial, sans-serif;
+}
+
+
+/* =========================================================
+   HOME BUTTON
+========================================================= */
+
+.auth-home-button {
+    position: absolute;
+
+    top: 25px;
+
+    left: 30px;
+
+    border: none;
+
+    background: white;
+
+    color: #312e81;
+
+    padding: 11px 18px;
+
+    border-radius: 10px;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 5px 20px rgba(15,23,42,0.12);
+}
+
+
+.auth-home-button:hover {
+    transform: translateX(-3px);
+}
+
+
+/* =========================================================
+   MAIN CONTAINER
+========================================================= */
+
+.auth-container {
+    width: 100%;
+
+    max-width: 1100px;
+
+    min-height: 650px;
+
+    display: grid;
+
+    grid-template-columns: 0.9fr 1.1fr;
+
+    background: white;
+
+    border-radius: 28px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 25px 70px rgba(15,23,42,0.18);
+}
+
+
+/* =========================================================
+   BRAND SIDE
+========================================================= */
+
+.auth-brand-side {
+    padding: 55px 45px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #0f172a,
+            #1e1b4b,
+            #312e81,
+            #2563eb
+        );
+
+    color: white;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+}
+
+
+.auth-brand-logo {
+    width: 70px;
+
+    height: 70px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: white;
+
+    border-radius: 20px;
+
+    font-size: 40px;
+
+    margin-bottom: 20px;
+}
+
+
+.auth-brand-side h1 {
+    color: white;
+
+    font-size: 40px;
+
+    margin: 0 0 30px;
+
+    font-weight: 950;
+}
+
+
+.auth-brand-side h2 {
+    color: white;
+
+    font-size: 30px;
+
+    margin: 0 0 15px;
+}
+
+
+.auth-brand-side > p {
+    color: #dbeafe;
+
+    line-height: 1.7;
+
+    font-size: 16px;
+
+    margin-bottom: 30px;
+}
+
+
+/* =========================================================
+   BENEFITS
+========================================================= */
+
+.auth-benefit {
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    margin: 12px 0;
+
+    padding: 13px;
+
+    border-radius: 12px;
+
+    background:
+        rgba(255,255,255,0.08);
+}
+
+
+.auth-benefit > span {
+    font-size: 25px;
+}
+
+
+.auth-benefit strong {
+    display: block;
+
+    color: white;
+
+    margin-bottom: 3px;
+}
+
+
+.auth-benefit small {
+    color: #c7d2fe;
+}
+
+
+/* =========================================================
+   FORM SIDE
+========================================================= */
+
+.auth-form-side {
+    padding: 40px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #ffffff;
+}
+
+
+.auth-card {
+    width: 100%;
+
+    max-width: 480px;
+}
+
+
+.auth-card-icon {
+    width: 60px;
+
+    height: 60px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #e0e7ff,
+            #dbeafe
+        );
+
+    font-size: 30px;
+
+    margin-bottom: 15px;
+}
+
+
+.auth-card h2 {
+    color: #111827;
+
+    font-size: 34px;
+
+    margin: 0 0 7px;
+
+    font-weight: 900;
+}
+
+
+.auth-subtitle {
+    color: #64748b;
+
+    margin-bottom: 28px;
+}
+
+
+/* =========================================================
+   LABEL
+========================================================= */
+
+.auth-card label {
+    display: block;
+
+    color: #1e293b;
+
+    font-size: 14px;
+
+    font-weight: 800;
+
+    margin: 17px 0 7px;
+}
+
+
+/* =========================================================
+   INPUT
+========================================================= */
+
+.auth-input-wrapper {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    height: 50px;
+
+    padding: 0 14px;
+
+    border: 2px solid #e2e8f0;
+
+    border-radius: 11px;
+
+    background: #f8fafc;
+
+    transition: 0.2s;
+}
+
+
+.auth-input-wrapper:focus-within {
+    border-color: #4f46e5;
+
+    background: white;
+
+    box-shadow:
+        0 0 0 4px rgba(79,70,229,0.08);
+}
+
+
+.auth-input-wrapper span {
+    font-size: 18px;
+}
+
+
+.auth-input-wrapper input {
+    width: 100%;
+
+    height: 100%;
+
+    border: none;
+
+    outline: none;
+
+    background: transparent;
+
+    color: #111827;
+
+    font-size: 15px;
+}
+
+
+.auth-input-wrapper input::placeholder {
+    color: #94a3b8;
+}
+
+
+/* =========================================================
+   SUBMIT BUTTON
+========================================================= */
+
+.auth-submit-button {
+    width: 100%;
+
+    margin-top: 25px;
+
+    padding: 15px;
+
+    border: none;
+
+    border-radius: 11px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #4f46e5,
+            #2563eb
+        );
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: 900;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 10px 25px rgba(37,99,235,0.20);
+
+    transition: 0.2s;
+}
+
+
+.auth-submit-button:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 15px 30px rgba(37,99,235,0.30);
+}
+
+
+.auth-submit-button:disabled {
+    opacity: 0.7;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+
+/* =========================================================
+   ROLE SELECTION
+========================================================= */
+
+.role-selection {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 12px;
+}
+
+
+.role-button {
+    padding: 13px;
+
+    border-radius: 11px;
+
+    border: 2px solid #e2e8f0;
+
+    background: #f8fafc;
+
+    color: #334155;
+
+    cursor: pointer;
+
+    font-weight: 800;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+}
+
+
+.role-button.active {
+    border-color: #4f46e5;
+
+    background: #eef2ff;
+
+    color: #3730a3;
+
+    box-shadow:
+        0 0 0 3px rgba(79,70,229,0.08);
+}
+
+
+/* =========================================================
+   MESSAGES
+========================================================= */
+
+.auth-success {
+    margin-top: 18px;
+
+    padding: 12px;
+
+    border-radius: 10px;
+
+    background: #dcfce7;
+
+    color: #166534;
+
+    font-weight: 700;
+
+    text-align: center;
+}
+
+
+.auth-error {
+    margin-top: 18px;
+
+    padding: 12px;
+
+    border-radius: 10px;
+
+    background: #fee2e2;
+
+    color: #991b1b;
+
+    font-weight: 700;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   SWITCH LOGIN / REGISTER
+========================================================= */
+
+.auth-switch {
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 6px;
+
+    margin-top: 25px;
+
+    font-size: 14px;
+
+    color: #64748b;
+}
+
+
+.auth-switch button {
+    border: none;
+
+    background: none;
+
+    color: #4f46e5;
+
+    font-weight: 900;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   SECURITY
+========================================================= */
+
+.auth-secure {
+    text-align: center;
+
+    margin-top: 20px;
+
+    color: #94a3b8;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   REGISTER LEFT SIDE
+========================================================= */
+
+.register-side {
+    background:
+        linear-gradient(
+            145deg,
+            #172554,
+            #312e81,
+            #4f46e5,
+            #2563eb
+        );
+}
+
+
+.register-role-card {
+    display: flex;
+
+    gap: 13px;
+
+    padding: 14px;
+
+    margin: 8px 0;
+
+    border-radius: 12px;
+
+    background:
+        rgba(255,255,255,0.09);
+}
+
+
+.register-role-icon {
+    font-size: 25px;
+}
+
+
+.register-role-card strong {
+    color: white;
+
+    display: block;
+
+    margin-bottom: 3px;
+}
+
+
+.register-role-card p {
+    color: #dbeafe;
+
+    font-size: 12px;
+
+    line-height: 1.4;
+
+    margin: 0;
+}
+
+
+.register-admin-note {
+    margin-top: 18px;
+
+    padding: 12px;
+
+    border-radius: 10px;
+
+    background:
+        rgba(255,255,255,0.08);
+
+    color: #bfdbfe;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 850px) {
+
+    .auth-container {
+        grid-template-columns: 1fr;
+
+        max-width: 550px;
+    }
+
+
+    .auth-brand-side {
+        padding: 35px;
+
+        text-align: center;
+    }
+
+
+    .auth-brand-logo {
+        margin-left: auto;
+
+        margin-right: auto;
+    }
+
+
+    .auth-brand-side h1 {
+        font-size: 34px;
+    }
+
+
+    .auth-benefit {
+        text-align: left;
+    }
+
+}
+
+
+@media (max-width: 550px) {
+
+    .auth-page {
+        padding: 80px 15px 25px;
+    }
+
+
+    .auth-home-button {
+        top: 18px;
+
+        left: 15px;
+    }
+
+
+    .auth-form-side {
+        padding: 25px 20px;
+    }
+
+
+    .auth-brand-side {
+        padding: 30px 22px;
+    }
+
+
+    .auth-card h2 {
+        font-size: 29px;
+    }
+
+
+    .role-selection {
+        grid-template-columns: 1fr;
+    }
+
 }

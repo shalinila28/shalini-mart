@@ -1,84 +1,179 @@
+import React from "react";
+
+import {
+    BrowserRouter,
+    Routes,
+    Route
+} from "react-router-dom";
+
 import Home from "./Home";
-import Register from "./Register";
 import Login from "./Login";
+import Register from "./Register";
+
 import CustomerDashboard from "./CustomerDashboard";
-import SellerDashboard from "./SellerDashboard";
 import Cart from "./Cart";
+import OrderHistory from "./OrderHistory";
+
+import SellerDashboard from "./SellerDashboard";
+import SellerProduct from "./SellerProducts";
+import SellerOrders from "./SellerOrders";
+
 import AdminDashboard from "./AdminDashboard";
+import AdminUsers from "./AdminUsers";
+import AdminProducts from "./AdminProducts";
+import AdminOrders from "./AdminOrders";
+import AdminReviews from "./AdminReviews";
+
 
 function App() {
 
-    const path = window.location.pathname;
+    return (
+
+        <BrowserRouter>
+
+            <div
+                style={{
+                    width: "100%",
+                    minHeight: "100vh",
+                    margin: 0,
+                    padding: 0,
+                    overflowX: "hidden"
+                }}
+            >
+
+                <Routes>
+
+                    {/* HOME */}
+
+                    <Route
+                        path="/"
+                        element={<Home />}
+                    />
 
 
-    // =====================================
-    // HOME PAGE
-    // =====================================
+                    {/* LOGIN */}
 
-    if (path === "/") {
-        return <Home />;
-    }
-
-
-    // =====================================
-    // REGISTER
-    // =====================================
-
-    if (path === "/register") {
-        return <Register />;
-    }
+                    <Route
+                        path="/login"
+                        element={<Login />}
+                    />
 
 
-    // =====================================
-    // LOGIN
-    // =====================================
+                    {/* REGISTER */}
 
-    if (path === "/login") {
-        return <Login />;
-    }
-
-
-    // =====================================
-    // CUSTOMER DASHBOARD
-    // =====================================
-
-    if (path === "/customer") {
-        return <CustomerDashboard />;
-    }
+                    <Route
+                        path="/register"
+                        element={<Register />}
+                    />
 
 
-    // =====================================
-    // SELLER DASHBOARD
-    // =====================================
+                    {/* =========================
+                        CUSTOMER
+                    ========================= */}
 
-    if (path === "/seller") {
-        return <SellerDashboard />;
-    }
+                    <Route
+                        path="/customer-dashboard"
+                        element={
+                            <CustomerDashboard />
+                        }
+                    />
+
+                    <Route
+                        path="/cart"
+                        element={
+                            <Cart />
+                        }
+                    />
+
+                    <Route
+                        path="/orders"
+                        element={
+                            <OrderHistory />
+                        }
+                    />
 
 
-    // =====================================
-    // CART
-    // =====================================
+                    {/* =========================
+                        SELLER
+                    ========================= */}
 
-    if (path === "/cart") {
-        return <Cart />;
-    }
+                    <Route
+                        path="/seller-dashboard"
+                        element={
+                            <SellerDashboard />
+                        }
+                    />
+
+                    <Route
+                        path="/seller/products"
+                        element={
+                            <SellerProduct />
+                        }
+                    />
+
+                    <Route
+                        path="/seller/orders"
+                        element={
+                            <SellerOrders />
+                        }
+                    />
 
 
-    // =====================================
-    // ADMIN DASHBOARD
-    // =====================================
+                    {/* =========================
+                        ADMIN
+                    ========================= */}
 
-    if (path === "/admin") {
-        return <AdminDashboard />;
-    }
+                    <Route
+                        path="/admin-dashboard"
+                        element={
+                            <AdminDashboard />
+                        }
+                    />
+
+                    <Route
+                        path="/admin/users"
+                        element={
+                            <AdminUsers />
+                        }
+                    />
+
+                    <Route
+                        path="/admin/products"
+                        element={
+                            <AdminProducts />
+                        }
+                    />
+
+                    <Route
+                        path="/admin/orders"
+                        element={
+                            <AdminOrders />
+                        }
+                    />
+
+                    <Route
+                        path="/admin/reviews"
+                        element={
+                            <AdminReviews />
+                        }
+                    />
 
 
-    // =====================================
-    // UNKNOWN URL
-    // =====================================
+                    {/* UNKNOWN URL */}
 
-    return <Home />;
+                    <Route
+                        path="*"
+                        element={
+                            <Home />
+                        }
+                    />
+
+                </Routes>
+
+            </div>
+
+        </BrowserRouter>
+    );
 }
 
 export default App;

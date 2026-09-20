@@ -1,904 +1,309 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 function SellerDashboard() {
 
-    // =====================================================
-    // GET LOGGED-IN SELLER
-    // =====================================================
+    const navigate = useNavigate();
 
     const loggedInUser =
         JSON.parse(localStorage.getItem("loggedInUser"));
 
-    const sellerId = loggedInUser?.id;
+    // ------------------------------------------
+    // LOGIN CHECK
+    // ------------------------------------------
 
+    if (!loggedInUser) {
+        navigate("/login");
+        return null;
+    }
 
-    // =====================================================
-    // PRODUCTS
-    // =====================================================
+    // ------------------------------------------
+    // SELLER CHECK
+    // ------------------------------------------
 
-    const [products, setProducts] = useState([]);
+    if (loggedInUser.role !== "SELLER") {
+        navigate("/");
+        return null;
+    }
 
+    // ------------------------------------------
+    // LOGOUT
+    // ------------------------------------------
 
-    // =====================================================
-    // SELLER ORDERS - F6
-    // =====================================================
+    const logout = () => {
 
-    const [sellerOrders, setSellerOrders] = useState([]);
+        localStorage.removeItem("loggedInUser");
 
-
-    // =====================================================
-    // PRODUCT FORM
-    // =====================================================
-
-    const [product, setProduct] = useState({
-
-        name: "",
-        description: "",
-        price: "",
-        stockQuantity: "",
-        category: "",
-        imageUrl: ""
-
-    });
-
-
-    // =====================================================
-    // EDITING PRODUCT ID
-    // =====================================================
-
-    const [editingId, setEditingId] = useState(null);
-
-
-    // =====================================================
-    // MESSAGE
-    // =====================================================
-
-    const [message, setMessage] = useState("");
-
-
-    // =====================================================
-    // LOAD DATA WHEN DASHBOARD OPENS
-    // =====================================================
-
-    useEffect(() => {
-
-        loadProducts();
-        loadSellerOrders();
-
-    }, []);
-
-
-    // =====================================================
-    // LOAD ALL PRODUCTS
-    // =====================================================
-
-    const loadProducts = async () => {
-
-        try {
-
-            const response = await fetch(
-                "http://localhost:8080/api/products"
-            );
-
-            if (!response.ok) {
-
-                throw new Error(
-                    "Failed to load products"
-                );
-
-            }
-
-            const data = await response.json();
-
-            setProducts(data);
-
-        } catch (error) {
-
-            console.error(
-                "Error loading products:",
-                error
-            );
-
-            setMessage(
-                "Unable to load products!"
-            );
-        }
+        navigate("/login");
     };
-
-
-    // =====================================================
-    // LOAD SELLER INCOMING ORDERS
-    // =====================================================
-
-    const loadSellerOrders = async () => {
-
-        if (!sellerId) {
-
-            console.error(
-                "Seller ID not found"
-            );
-
-            return;
-        }
-
-        try {
-
-            const response = await fetch(
-                `http://localhost:8080/api/orders/seller/${sellerId}`
-            );
-
-            if (!response.ok) {
-
-                throw new Error(
-                    "Failed to load seller orders"
-                );
-
-            }
-
-            const data = await response.json();
-
-            setSellerOrders(data);
-
-        } catch (error) {
-
-            console.error(
-                "Error loading seller orders:",
-                error
-            );
-        }
-    };
-
-
-    // =====================================================
-    // HANDLE PRODUCT INPUT
-    // =====================================================
-
-    const handleChange = (e) => {
-
-        setProduct({
-
-            ...product,
-
-            [e.target.name]: e.target.value
-
-        });
-    };
-
-
-    // =====================================================
-    // ADD / UPDATE PRODUCT
-    // =====================================================
-
-    const handleSubmit = async (e) => {
-
-        e.preventDefault();
-
-
-        // Seller ID check
-
-        if (!sellerId) {
-
-            setMessage(
-                "Seller information not found. Please login again."
-            );
-
-            return;
-        }
-
-
-        try {
-
-            let response;
-
-
-            // =================================================
-            // UPDATE PRODUCT
-            // =================================================
-
-            if (editingId !== null) {
-
-                response = await fetch(
-
-                    `http://localhost:8080/api/products/${editingId}?sellerId=${sellerId}`,
-
-                    {
-                        method: "PUT",
-
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-
-                        body: JSON.stringify(product)
-                    }
-                );
-
-            }
-
-
-            // =================================================
-            // ADD PRODUCT
-            // =================================================
-
-            else {
-
-                response = await fetch(
-
-                    "http://localhost:8080/api/products",
-
-                    {
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-
-                        body: JSON.stringify({
-
-                            ...product,
-
-                            sellerId: sellerId
-
-                        })
-                    }
-                );
-            }
-
-
-            // Read backend response
-
-            const result =
-                await response.text();
-
-
-            // If backend error
-
-            if (!response.ok) {
-
-                setMessage(result);
-
-                return;
-            }
-
-
-            // Success message
-
-            if (editingId !== null) {
-
-                setMessage(
-                    "Product updated successfully!"
-                );
-
-            } else {
-
-                setMessage(
-                    "Product added successfully!"
-                );
-            }
-
-
-            // Clear form
-
-            setProduct({
-
-                name: "",
-                description: "",
-                price: "",
-                stockQuantity: "",
-                category: "",
-                imageUrl: ""
-
-            });
-
-
-            // Exit edit mode
-
-            setEditingId(null);
-
-
-            // Reload products
-
-            loadProducts();
-
-        } catch (error) {
-
-            console.error(error);
-
-            setMessage(
-                "Cannot connect to backend!"
-            );
-        }
-    };
-
-
-    // =====================================================
-    // EDIT PRODUCT
-    // =====================================================
-
-    const editProduct = (item) => {
-
-
-        // Check ownership
-
-        if (item.sellerId !== sellerId) {
-
-            alert(
-                "You can edit only your own products."
-            );
-
-            return;
-        }
-
-
-        // Put product data into form
-
-        setProduct({
-
-            name: item.name,
-
-            description: item.description,
-
-            price: item.price,
-
-            stockQuantity: item.stockQuantity,
-
-            category: item.category,
-
-            imageUrl: item.imageUrl
-
-        });
-
-
-        // Store product ID
-
-        setEditingId(item.id);
-
-
-        // Clear old message
-
-        setMessage("");
-    };
-
-
-    // =====================================================
-    // DELETE PRODUCT
-    // =====================================================
-
-    const deleteProduct = async (
-        id,
-        productSellerId
-    ) => {
-
-
-        // Check ownership
-
-        if (productSellerId !== sellerId) {
-
-            alert(
-                "You can delete only your own products."
-            );
-
-            return;
-        }
-
-
-        // Confirmation
-
-        const confirmDelete =
-            window.confirm(
-                "Are you sure you want to delete this product?"
-            );
-
-
-        if (!confirmDelete) {
-
-            return;
-        }
-
-
-        try {
-
-            const response = await fetch(
-
-                `http://localhost:8080/api/products/${id}?sellerId=${sellerId}`,
-
-                {
-                    method: "DELETE"
-                }
-            );
-
-
-            const result =
-                await response.text();
-
-
-            if (!response.ok) {
-
-                setMessage(result);
-
-                return;
-            }
-
-
-            setMessage(
-                "Product deleted successfully!"
-            );
-
-
-            // Reload products
-
-            loadProducts();
-
-        } catch (error) {
-
-            console.error(error);
-
-            setMessage(
-                "Unable to delete product!"
-            );
-        }
-    };
-
-
-    // =====================================================
-    // CANCEL EDIT
-    // =====================================================
-
-    const cancelEdit = () => {
-
-        setEditingId(null);
-
-        setProduct({
-
-            name: "",
-            description: "",
-            price: "",
-            stockQuantity: "",
-            category: "",
-            imageUrl: ""
-
-        });
-
-        setMessage("");
-    };
-
-
-    // =====================================================
-    // UI
-    // =====================================================
 
     return (
 
-        <div
-            style={{
-                padding: "30px",
-                fontFamily: "Arial",
-                maxWidth: "1000px",
-                margin: "auto"
-            }}
-        >
+        <div style={styles.page}>
 
+            {/* ================= HEADER ================= */}
 
-            {/* =================================================
-                SELLER HEADER
-            ================================================= */}
+            <div style={styles.header}>
 
-            <h1>
-                Seller Dashboard
-            </h1>
+                <div>
+                    <h1 style={styles.logo}>
+                        🛒 ShaliniMart
+                    </h1>
 
+                    <h2 style={styles.title}>
+                        Seller Dashboard
+                    </h2>
 
-            <p>
-                <strong>
-                    Logged in Seller:
-                </strong>{" "}
-                {loggedInUser?.username}
-            </p>
+                    <p style={styles.welcome}>
+                        Welcome,{" "}
+                        <strong>
+                            {loggedInUser.username}
+                        </strong>
+                    </p>
+                </div>
 
-
-            <p>
-                <strong>
-                    Seller ID:
-                </strong>{" "}
-                {sellerId}
-            </p>
-
-
-            <hr />
-
-
-            {/* =================================================
-                PRODUCT FORM
-            ================================================= */}
-
-            <h2>
-
-                {editingId !== null
-                    ? "Edit Product"
-                    : "Add Product"}
-
-            </h2>
-
-
-            <form onSubmit={handleSubmit}>
-
-
-                {/* PRODUCT NAME */}
-
-                <input
-                    type="text"
-                    name="name"
-                    placeholder="Product Name"
-                    value={product.name}
-                    onChange={handleChange}
-                    required
-                />
-
-                <br />
-                <br />
-
-
-                {/* DESCRIPTION */}
-
-                <textarea
-                    name="description"
-                    placeholder="Product Description"
-                    value={product.description}
-                    onChange={handleChange}
-                    required
-                />
-
-                <br />
-                <br />
-
-
-                {/* PRICE */}
-
-                <input
-                    type="number"
-                    name="price"
-                    placeholder="Price"
-                    value={product.price}
-                    onChange={handleChange}
-                    min="0"
-                    required
-                />
-
-                <br />
-                <br />
-
-
-                {/* STOCK */}
-
-                <input
-                    type="number"
-                    name="stockQuantity"
-                    placeholder="Stock Quantity"
-                    value={product.stockQuantity}
-                    onChange={handleChange}
-                    min="0"
-                    required
-                />
-
-                <br />
-                <br />
-
-
-                {/* CATEGORY */}
-
-                <input
-                    type="text"
-                    name="category"
-                    placeholder="Category"
-                    value={product.category}
-                    onChange={handleChange}
-                    required
-                />
-
-                <br />
-                <br />
-
-
-                {/* IMAGE URL */}
-
-                <input
-                    type="text"
-                    name="imageUrl"
-                    placeholder="Image URL"
-                    value={product.imageUrl}
-                    onChange={handleChange}
-                />
-
-                <br />
-                <br />
-
-
-                {/* SUBMIT BUTTON */}
-
-                <button type="submit">
-
-                    {editingId !== null
-                        ? "Update Product"
-                        : "Add Product"}
-
+                <button
+                    style={styles.logout}
+                    onClick={logout}
+                >
+                    Logout
                 </button>
 
+            </div>
 
-                {/* CANCEL BUTTON */}
 
-                {editingId !== null && (
+            {/* ================= TITLE ================= */}
+
+            <h2 style={styles.sectionTitle}>
+                🏪 Seller Management
+            </h2>
+
+
+            {/* ================= SELLER OPTIONS ================= */}
+
+            <div style={styles.grid}>
+
+                {/* ADD PRODUCT */}
+
+                <div
+                    style={styles.card}
+                    onClick={() =>
+                        navigate("/seller/products/add")
+                    }
+                >
+
+                    <div style={styles.icon}>
+                        ➕
+                    </div>
+
+                    <h2 style={styles.cardTitle}>
+                        Add Product
+                    </h2>
+
+                    <p style={styles.cardText}>
+                        Add a new product to ShaliniMart
+                    </p>
 
                     <button
-                        type="button"
-                        onClick={cancelEdit}
-                        style={{
-                            marginLeft: "10px"
+                        style={styles.button}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            navigate("/seller/products/add");
                         }}
                     >
-                        Cancel
+                        Add Product
                     </button>
 
-                )}
-
-            </form>
+                </div>
 
 
-            {/* =================================================
-                MESSAGE
-            ================================================= */}
+                {/* MY PRODUCTS */}
 
-            {message && (
+                <div
+                    style={styles.card}
+                    onClick={() =>
+                        navigate("/seller/products")
+                    }
+                >
 
-                <h3>
-                    {message}
-                </h3>
-
-            )}
-
-
-            <hr />
-
-
-            {/* =================================================
-                ALL PRODUCTS
-            ================================================= */}
-
-            <h2>
-                All Products
-            </h2>
-
-
-            <p>
-                You can view all sellers' products,
-                but you can edit or delete only your
-                own products.
-            </p>
-
-
-            {products.length === 0 ? (
-
-                <p>
-                    No products available.
-                </p>
-
-            ) : (
-
-                products.map((item) => (
-
-                    <div
-                        key={item.id}
-                        style={{
-                            border: "1px solid gray",
-                            padding: "15px",
-                            margin: "10px 0",
-                            borderRadius: "8px"
-                        }}
-                    >
-
-
-                        <h3>
-                            {item.name}
-                        </h3>
-
-
-                        <p>
-                            {item.description}
-                        </p>
-
-
-                        <p>
-                            <strong>
-                                Price:
-                            </strong>{" "}
-                            ₹{item.price}
-                        </p>
-
-
-                        <p>
-                            <strong>
-                                Stock:
-                            </strong>{" "}
-                            {item.stockQuantity}
-                        </p>
-
-
-                        <p>
-                            <strong>
-                                Category:
-                            </strong>{" "}
-                            {item.category}
-                        </p>
-
-
-                        <p>
-                            <strong>
-                                Seller ID:
-                            </strong>{" "}
-                            {item.sellerId}
-                        </p>
-
-
-                        {/* IMAGE */}
-
-                        {item.imageUrl && (
-
-                            <img
-                                src={item.imageUrl}
-                                alt={item.name}
-                                width="150"
-                            />
-
-                        )}
-
-
-                        <br />
-                        <br />
-
-
-                        {/* =================================================
-                            OWN PRODUCT
-                        ================================================= */}
-
-                        {item.sellerId === sellerId ? (
-
-                            <>
-
-                                <button
-                                    onClick={() =>
-                                        editProduct(item)
-                                    }
-                                >
-                                    Edit
-                                </button>
-
-
-                                <button
-                                    onClick={() =>
-                                        deleteProduct(
-                                            item.id,
-                                            item.sellerId
-                                        )
-                                    }
-                                    style={{
-                                        marginLeft: "10px"
-                                    }}
-                                >
-                                    Delete
-                                </button>
-
-                            </>
-
-                        ) : (
-
-                            /* =================================================
-                               OTHER SELLER PRODUCT
-                            ================================================= */
-
-                            <p>
-                                👁️ <strong>View only</strong>
-                                <br />
-                                This product belongs to
-                                another seller.
-                            </p>
-
-                        )}
-
+                    <div style={styles.icon}>
+                        🛍️
                     </div>
 
-                ))
+                    <h2 style={styles.cardTitle}>
+                        My Products
+                    </h2>
 
-            )}
+                    <p style={styles.cardText}>
+                        View, edit and delete your products
+                    </p>
 
-
-            {/* =================================================
-                F6 - INCOMING ORDERS
-            ================================================= */}
-
-            <hr />
-
-
-            <h2>
-                Incoming Orders
-            </h2>
-
-
-            <p>
-                Orders received for your products.
-            </p>
-
-
-            {sellerOrders.length === 0 ? (
-
-                <p>
-                    No incoming orders yet.
-                </p>
-
-            ) : (
-
-                sellerOrders.map((order, index) => (
-
-                    <div
-                        key={index}
-                        style={{
-                            border: "1px solid gray",
-                            padding: "15px",
-                            margin: "10px 0",
-                            borderRadius: "8px"
+                    <button
+                        style={styles.button}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            navigate("/seller/products");
                         }}
                     >
+                        View Products
+                    </button>
+
+                </div>
 
 
-                        <h3>
-                            Order ID: {order.orderId}
-                        </h3>
+                {/* INCOMING ORDERS */}
 
+                <div
+                    style={styles.card}
+                    onClick={() =>
+                        navigate("/seller/orders")
+                    }
+                >
 
-                        <p>
-                            <strong>
-                                Customer ID:
-                            </strong>{" "}
-                            {order.customerId}
-                        </p>
-
-
-                        <p>
-                            <strong>
-                                Product:
-                            </strong>{" "}
-                            {order.productName}
-                        </p>
-
-
-                        <p>
-                            <strong>
-                                Quantity:
-                            </strong>{" "}
-                            {order.quantity}
-                        </p>
-
-
-                        <p>
-                            <strong>
-                                Price:
-                            </strong>{" "}
-                            ₹{order.price}
-                        </p>
-
-
-                        <p>
-                            <strong>
-                                Status:
-                            </strong>{" "}
-                            {order.status}
-                        </p>
-
+                    <div style={styles.icon}>
+                        📦
                     </div>
 
-                ))
+                    <h2 style={styles.cardTitle}>
+                        Incoming Orders
+                    </h2>
 
-            )}
+                    <p style={styles.cardText}>
+                        View and manage customer orders
+                    </p>
+
+                    <button
+                        style={styles.button}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            navigate("/seller/orders");
+                        }}
+                    >
+                        View Orders
+                    </button>
+
+                </div>
+
+            </div>
 
         </div>
     );
 }
+
+
+/* =====================================================
+   STYLES
+===================================================== */
+
+const styles = {
+
+    page: {
+        minHeight: "100vh",
+        padding: "35px",
+        fontFamily: "Arial, sans-serif",
+        background:
+            "linear-gradient(135deg, #eef2ff, #f8fafc)",
+        color: "#172033"
+    },
+
+    header: {
+        background:
+            "linear-gradient(135deg, #172554, #2563eb)",
+        color: "white",
+        padding: "30px",
+        borderRadius: "20px",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        boxShadow:
+            "0 10px 30px rgba(37, 99, 235, 0.25)",
+        marginBottom: "40px"
+    },
+
+    logo: {
+        margin: "0 0 8px 0",
+        fontSize: "32px"
+    },
+
+    title: {
+        margin: "5px 0",
+        fontSize: "25px"
+    },
+
+    welcome: {
+        margin: "10px 0 0 0",
+        fontSize: "17px"
+    },
+
+    logout: {
+        backgroundColor: "#ef4444",
+        color: "white",
+        border: "none",
+        padding: "13px 25px",
+        borderRadius: "10px",
+        fontSize: "16px",
+        fontWeight: "bold",
+        cursor: "pointer"
+    },
+
+    sectionTitle: {
+        textAlign: "center",
+        fontSize: "28px",
+        marginBottom: "30px",
+        color: "#172554"
+    },
+
+    grid: {
+        display: "grid",
+        gridTemplateColumns:
+            "repeat(auto-fit, minmax(280px, 1fr))",
+        gap: "30px",
+        maxWidth: "1100px",
+        margin: "auto"
+    },
+
+    card: {
+        backgroundColor: "white",
+        borderRadius: "20px",
+        padding: "35px 25px",
+        textAlign: "center",
+        boxShadow:
+            "0 8px 25px rgba(0, 0, 0, 0.12)",
+        cursor: "pointer",
+        transition: "0.3s",
+        border: "1px solid #e5e7eb"
+    },
+
+    icon: {
+        fontSize: "55px",
+        marginBottom: "15px"
+    },
+
+    cardTitle: {
+        fontSize: "23px",
+        color: "#172554",
+        marginBottom: "10px"
+    },
+
+    cardText: {
+        color: "#475569",
+        fontSize: "15px",
+        lineHeight: "1.5",
+        minHeight: "45px"
+    },
+
+    button: {
+        marginTop: "20px",
+        background:
+            "linear-gradient(135deg, #2563eb, #1d4ed8)",
+        color: "white",
+        border: "none",
+        padding: "13px 25px",
+        borderRadius: "10px",
+        fontSize: "15px",
+        fontWeight: "bold",
+        cursor: "pointer"
+    }
+};
 
 export default SellerDashboard;

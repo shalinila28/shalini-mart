@@ -1,615 +1,663 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import "./Dashboard.css";
 
 function AdminDashboard() {
 
-    const [users, setUsers] = useState([]);
-    const [orders, setOrders] = useState([]);
-    const [products, setProducts] = useState([]);
+    const navigate = useNavigate();
 
-    const [activeSection, setActiveSection] = useState("users");
-    const [message, setMessage] = useState("");
+    // =====================================================
+    // GET LOGGED-IN USER
+    // =====================================================
 
-    // Admin ID
     const loggedInUser = JSON.parse(
         localStorage.getItem("loggedInUser")
     );
 
-    const adminId = loggedInUser?.id;
 
-    // ==========================================
-    // LOAD USERS
-    // ==========================================
+    // =====================================================
+    // SUMMARY
+    // =====================================================
 
-    const loadUsers = async () => {
-
-        try {
-
-            const response = await fetch(
-                `http://localhost:8080/api/admin/users?adminId=${adminId}`
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                setMessage("Unable to load users");
-                return;
-            }
-
-            setUsers(data);
-
-        } catch (error) {
-
-            console.error(error);
-            setMessage("Cannot connect to backend");
-
-        }
-    };
+    const [summary, setSummary] = useState({
+        totalUsers: 0,
+        totalProducts: 0,
+        totalOrders: 0,
+        totalReviews: 0
+    });
 
 
-    // ==========================================
-    // LOAD ORDERS
-    // ==========================================
+    const [loading, setLoading] = useState(true);
 
-    const loadOrders = async () => {
-
-        try {
-
-            const response = await fetch(
-                `http://localhost:8080/api/admin/orders?adminId=${adminId}`
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                setMessage("Unable to load orders");
-                return;
-            }
-
-            setOrders(data);
-
-        } catch (error) {
-
-            console.error(error);
-            setMessage("Cannot connect to backend");
-
-        }
-    };
+    const [error, setError] = useState("");
 
 
-    // ==========================================
-    // LOAD PRODUCTS
-    // ==========================================
-
-    const loadProducts = async () => {
-
-        try {
-
-            const response = await fetch(
-                `http://localhost:8080/api/admin/products?adminId=${adminId}`
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                setMessage("Unable to load products");
-                return;
-            }
-
-            setProducts(data);
-
-        } catch (error) {
-
-            console.error(error);
-            setMessage("Cannot connect to backend");
-
-        }
-    };
-
-
-    // ==========================================
-    // LOAD ALL DATA
-    // ==========================================
+    // =====================================================
+    // CHECK ADMIN LOGIN
+    // =====================================================
 
     useEffect(() => {
 
-        if (!adminId) {
-            setMessage("Admin login required!");
+        if (!loggedInUser) {
+
+            navigate("/login");
+
             return;
         }
 
-        loadUsers();
-        loadOrders();
-        loadProducts();
 
-    }, [adminId]);
+        if (
+            !loggedInUser.role ||
+            loggedInUser.role.toUpperCase() !== "ADMIN"
+        ) {
 
+            navigate("/");
 
-    // ==========================================
-    // REMOVE PRODUCT
-    // ==========================================
-
-    const removeProduct = async (productId) => {
-
-        const confirmDelete = window.confirm(
-            "Are you sure you want to remove this product?"
-        );
-
-        if (!confirmDelete) {
             return;
         }
+
+
+        loadSummary();
+
+    }, []);
+
+
+    // =====================================================
+    // LOAD ADMIN SUMMARY
+    // =====================================================
+
+    const loadSummary = async () => {
 
         try {
 
+            setLoading(true);
+
+            setError("");
+
+
             const response = await fetch(
-                `http://localhost:8080/api/admin/products/${productId}?adminId=${adminId}`,
-                {
-                    method: "DELETE"
-                }
+                "http://localhost:8080/api/admin/summary"
             );
 
-            const data = await response.text();
 
-            if (response.ok) {
+            if (!response.ok) {
 
-                setMessage(data);
-
-                // Refresh product list
-                loadProducts();
-
-            } else {
-
-                setMessage(data);
+                throw new Error(
+                    "Unable to load dashboard data"
+                );
             }
+
+
+            const data = await response.json();
+
+
+            setSummary({
+
+                totalUsers:
+                    data.totalUsers ?? 0,
+
+                totalProducts:
+                    data.totalProducts ?? 0,
+
+                totalOrders:
+                    data.totalOrders ?? 0,
+
+                totalReviews:
+                    data.totalReviews ?? 0
+
+            });
 
         } catch (error) {
 
-            console.error(error);
-            setMessage("Cannot connect to backend");
+            console.error(
+                "Admin summary error:",
+                error
+            );
+
+
+            setError(
+                "Cannot connect to the backend. Make sure Spring Boot is running."
+            );
+
+        } finally {
+
+            setLoading(false);
 
         }
     };
 
 
-    // ==========================================
+    // =====================================================
     // LOGOUT
-    // ==========================================
+    // =====================================================
 
     const logout = () => {
 
-        localStorage.removeItem("loggedInUser");
+        localStorage.removeItem(
+            "loggedInUser"
+        );
 
-        window.location.href = "/";
+        navigate("/");
+
     };
 
 
-    // ==========================================
-    // ADMIN SECURITY CHECK
-    // ==========================================
+    // =====================================================
+    // IF USER DOES NOT EXIST
+    // =====================================================
 
     if (!loggedInUser) {
 
-        return (
-            <div style={styles.center}>
-                <h2>Admin Login Required</h2>
-                <p>Please login first.</p>
-            </div>
-        );
+        return null;
+
     }
 
 
-    if (loggedInUser.role !== "ADMIN") {
-
-        return (
-            <div style={styles.center}>
-                <h2>Access Denied ❌</h2>
-                <p>Only Admin can access this page.</p>
-            </div>
-        );
-    }
-
-
-    // ==========================================
-    // DASHBOARD
-    // ==========================================
+    // =====================================================
+    // DASHBOARD UI
+    // =====================================================
 
     return (
 
-        <div style={styles.page}>
+        <div className="dashboard-page">
 
-            {/* HEADER */}
 
-            <div style={styles.header}>
+            {/* =================================================
+                HEADER
+            ================================================= */}
 
-                <div>
-                    <h1>ShaliniMart Admin Dashboard</h1>
+            <header className="dashboard-header">
 
-                    <p>
-                        Welcome, {loggedInUser.username} 👋
-                    </p>
 
-                    <p>
-                        Admin ID: {adminId}
-                    </p>
+                {/* BRAND */}
+
+                <div className="brand">
+
+                    <div className="brand-icon">
+                        🛒
+                    </div>
+
+
+                    <div>
+
+                        <div className="brand-name">
+                            ShaliniMart
+                        </div>
+
+                        <div className="brand-subtitle">
+                            Smart Shopping • Easy Management
+                        </div>
+
+                    </div>
+
                 </div>
 
-                <button
-                    style={styles.logoutButton}
-                    onClick={logout}
+
+                {/* HEADER RIGHT */}
+
+                <div className="header-right">
+
+
+                    <div className="user-info">
+
+                        👑{" "}
+
+                        {loggedInUser.username ||
+                            "Admin"}
+
+                    </div>
+
+
+                    <button
+                        className="logout-button"
+                        onClick={logout}
+                    >
+                        Logout
+                    </button>
+
+                </div>
+
+            </header>
+
+
+
+            {/* =================================================
+                MAIN CONTENT
+            ================================================= */}
+
+            <main className="dashboard-content">
+
+
+                {/* =================================================
+                    WELCOME
+                ================================================= */}
+
+                <div className="welcome-card">
+
+                    <h1>
+                        Welcome,{" "}
+                        {loggedInUser.username ||
+                            "Admin"}{" "}
+                        👋
+                    </h1>
+
+
+                    <p>
+                        Manage your ShaliniMart
+                        application from one place.
+                    </p>
+
+                </div>
+
+
+
+                {/* =================================================
+                    DASHBOARD TITLE
+                ================================================= */}
+
+                <h2 className="section-title">
+
+                    📊 Dashboard Overview
+
+                </h2>
+
+
+
+                {/* =================================================
+                    SUMMARY CARDS
+                ================================================= */}
+
+                <div className="stats-grid">
+
+
+                    {/* USERS */}
+
+                    <div
+                        className="stat-card"
+                        onClick={() =>
+                            navigate("/admin/users")
+                        }
+                        style={{
+                            cursor: "pointer"
+                        }}
+                    >
+
+                        <div className="stat-icon">
+                            👥
+                        </div>
+
+
+                        <div className="stat-title">
+                            Total Users
+                        </div>
+
+
+                        <div className="stat-number">
+
+                            {loading
+                                ? "..."
+                                : summary.totalUsers}
+
+                        </div>
+
+                    </div>
+
+
+
+                    {/* PRODUCTS */}
+
+                    <div
+                        className="stat-card"
+                        onClick={() =>
+                            navigate("/admin/products")
+                        }
+                        style={{
+                            cursor: "pointer"
+                        }}
+                    >
+
+                        <div className="stat-icon">
+                            🛍️
+                        </div>
+
+
+                        <div className="stat-title">
+                            Total Products
+                        </div>
+
+
+                        <div className="stat-number">
+
+                            {loading
+                                ? "..."
+                                : summary.totalProducts}
+
+                        </div>
+
+                    </div>
+
+
+
+                    {/* ORDERS */}
+
+                    <div
+                        className="stat-card"
+                        onClick={() =>
+                            navigate("/admin/orders")
+                        }
+                        style={{
+                            cursor: "pointer"
+                        }}
+                    >
+
+                        <div className="stat-icon">
+                            📦
+                        </div>
+
+
+                        <div className="stat-title">
+                            Total Orders
+                        </div>
+
+
+                        <div className="stat-number">
+
+                            {loading
+                                ? "..."
+                                : summary.totalOrders}
+
+                        </div>
+
+                    </div>
+
+
+
+                    {/* REVIEWS */}
+
+                    <div
+                        className="stat-card"
+                        onClick={() =>
+                            navigate("/admin/reviews")
+                        }
+                        style={{
+                            cursor: "pointer"
+                        }}
+                    >
+
+                        <div className="stat-icon">
+                            ⭐
+                        </div>
+
+
+                        <div className="stat-title">
+                            Total Reviews
+                        </div>
+
+
+                        <div className="stat-number">
+
+                            {loading
+                                ? "..."
+                                : summary.totalReviews}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                {/* =================================================
+                    ERROR MESSAGE
+                ================================================= */}
+
+                {error && (
+
+                    <div
+                        style={{
+                            backgroundColor: "#fee2e2",
+                            color: "#991b1b",
+                            padding: "15px",
+                            borderRadius: "10px",
+                            marginTop: "25px",
+                            fontWeight: "bold"
+                        }}
+                    >
+
+                        ⚠️ {error}
+
+                        <br />
+
+                        <button
+                            onClick={loadSummary}
+                            style={{
+                                marginTop: "10px",
+                                padding: "8px 15px",
+                                border: "none",
+                                borderRadius: "8px",
+                                cursor: "pointer"
+                            }}
+                        >
+                            Try Again
+                        </button>
+
+                    </div>
+
+                )}
+
+
+
+                {/* =================================================
+                    MANAGEMENT
+                ================================================= */}
+
+                <h2
+                    className="section-title"
+                    style={{
+                        marginTop: "40px"
+                    }}
                 >
-                    Logout
-                </button>
 
-            </div>
+                    ⚙️ Admin Management
+
+                </h2>
 
 
-            {/* MESSAGE */}
 
-            {message && (
+                <p
+                    style={{
+                        color: "#64748b",
+                        marginBottom: "20px"
+                    }}
+                >
 
-                <div style={styles.message}>
-                    {message}
+                    Select an option to manage your
+                    ShaliniMart application.
+
+                </p>
+
+
+
+                {/* =================================================
+                    MANAGEMENT CARDS
+                ================================================= */}
+
+                <div className="action-grid">
+
+
+                    {/* =================================================
+                        USERS
+                    ================================================= */}
+
+                    <button
+                        className="action-card"
+                        onClick={() =>
+                            navigate("/admin/users")
+                        }
+                    >
+
+                        <div className="action-icon">
+                            👥
+                        </div>
+
+
+                        <h3>
+                            Manage Users
+                        </h3>
+
+
+                        <p>
+                            View and manage registered
+                            customers and sellers.
+                        </p>
+
+                    </button>
+
+
+
+                    {/* =================================================
+                        PRODUCTS
+                    ================================================= */}
+
+                    <button
+                        className="action-card"
+                        onClick={() =>
+                            navigate("/admin/products")
+                        }
+                    >
+
+                        <div className="action-icon">
+                            🛍️
+                        </div>
+
+
+                        <h3>
+                            Manage Products
+                        </h3>
+
+
+                        <p>
+                            View and manage products
+                            available in ShaliniMart.
+                        </p>
+
+                    </button>
+
+
+
+                    {/* =================================================
+                        ORDERS
+                    ================================================= */}
+
+                    <button
+                        className="action-card"
+                        onClick={() =>
+                            navigate("/admin/orders")
+                        }
+                    >
+
+                        <div className="action-icon">
+                            📦
+                        </div>
+
+
+                        <h3>
+                            Manage Orders
+                        </h3>
+
+
+                        <p>
+                            View customer orders and
+                            order information.
+                        </p>
+
+                    </button>
+
+
+
+                    {/* =================================================
+                        REVIEWS
+                    ================================================= */}
+
+                    <button
+                        className="action-card"
+                        onClick={() =>
+                            navigate("/admin/reviews")
+                        }
+                    >
+
+                        <div className="action-icon">
+                            ⭐
+                        </div>
+
+
+                        <h3>
+                            Manage Reviews
+                        </h3>
+
+
+                        <p>
+                            View customer reviews and
+                            remove inappropriate reviews.
+                        </p>
+
+                    </button>
+
                 </div>
 
-            )}
 
 
-            {/* NAVIGATION */}
+                {/* =================================================
+                    ADMIN INFORMATION
+                ================================================= */}
 
-            <div style={styles.navigation}>
-
-                <button
-                    style={
-                        activeSection === "users"
-                            ? styles.activeButton
-                            : styles.navButton
-                    }
-                    onClick={() => setActiveSection("users")}
+                <div
+                    style={{
+                        marginTop: "40px",
+                        background:
+                            "linear-gradient(135deg, #eef2ff, #f5f3ff)",
+                        padding: "25px",
+                        borderRadius: "18px",
+                        border:
+                            "1px solid #e0e7ff"
+                    }}
                 >
-                    👥 Users
-                </button>
+
+                    <h3
+                        style={{
+                            marginTop: 0,
+                            color: "#312e81"
+                        }}
+                    >
+                        👑 Administrator Access
+                    </h3>
 
 
-                <button
-                    style={
-                        activeSection === "orders"
-                            ? styles.activeButton
-                            : styles.navButton
-                    }
-                    onClick={() => setActiveSection("orders")}
-                >
-                    📦 Orders
-                </button>
+                    <p
+                        style={{
+                            color: "#475569",
+                            lineHeight: "1.6"
+                        }}
+                    >
 
+                        As the administrator, you can
+                        monitor users, products, orders
+                        and reviews across the
+                        ShaliniMart application.
 
-                <button
-                    style={
-                        activeSection === "products"
-                            ? styles.activeButton
-                            : styles.navButton
-                    }
-                    onClick={() => setActiveSection("products")}
-                >
-                    🛍️ Products
-                </button>
-
-            </div>
-
-
-            {/* ======================================
-                USERS SECTION
-            ====================================== */}
-
-            {activeSection === "users" && (
-
-                <div style={styles.section}>
-
-                    <h2>👥 All Users</h2>
-
-                    <p>
-                        Total Users: <b>{users.length}</b>
                     </p>
 
-                    <table style={styles.table}>
-
-                        <thead>
-
-                            <tr>
-                                <th style={styles.th}>ID</th>
-                                <th style={styles.th}>Username</th>
-                                <th style={styles.th}>Email</th>
-                                <th style={styles.th}>Role</th>
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-
-                            {users.map((user) => (
-
-                                <tr key={user.id}>
-
-                                    <td style={styles.td}>
-                                        {user.id}
-                                    </td>
-
-                                    <td style={styles.td}>
-                                        {user.username}
-                                    </td>
-
-                                    <td style={styles.td}>
-                                        {user.email}
-                                    </td>
-
-                                    <td style={styles.td}>
-                                        {user.role}
-                                    </td>
-
-                                </tr>
-
-                            ))}
-
-                        </tbody>
-
-                    </table>
-
                 </div>
 
-            )}
-
-
-            {/* ======================================
-                ORDERS SECTION
-            ====================================== */}
-
-            {activeSection === "orders" && (
-
-                <div style={styles.section}>
-
-                    <h2>📦 All Orders</h2>
-
-                    <p>
-                        Total Orders: <b>{orders.length}</b>
-                    </p>
-
-                    <table style={styles.table}>
-
-                        <thead>
-
-                            <tr>
-                                <th style={styles.th}>Order ID</th>
-                                <th style={styles.th}>Customer ID</th>
-                                <th style={styles.th}>Total Amount</th>
-                                <th style={styles.th}>Status</th>
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-
-                            {orders.map((order) => (
-
-                                <tr key={order.id}>
-
-                                    <td style={styles.td}>
-                                        {order.id}
-                                    </td>
-
-                                    <td style={styles.td}>
-                                        {order.customerId}
-                                    </td>
-
-                                    <td style={styles.td}>
-                                        ₹{order.totalAmount}
-                                    </td>
-
-                                    <td style={styles.td}>
-                                        {order.status}
-                                    </td>
-
-                                </tr>
-
-                            ))}
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            )}
-
-
-            {/* ======================================
-                PRODUCTS SECTION
-            ====================================== */}
-
-            {activeSection === "products" && (
-
-                <div style={styles.section}>
-
-                    <h2>🛍️ Product Management</h2>
-
-                    <p>
-                        Total Products: <b>{products.length}</b>
-                    </p>
-
-                    <table style={styles.table}>
-
-                        <thead>
-
-                            <tr>
-                                <th style={styles.th}>ID</th>
-                                <th style={styles.th}>Name</th>
-                                <th style={styles.th}>Category</th>
-                                <th style={styles.th}>Price</th>
-                                <th style={styles.th}>Stock</th>
-                                <th style={styles.th}>Seller ID</th>
-                                <th style={styles.th}>Action</th>
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-
-                            {products.map((product) => (
-
-                                <tr key={product.id}>
-
-                                    <td style={styles.td}>
-                                        {product.id}
-                                    </td>
-
-                                    <td style={styles.td}>
-                                        {product.name}
-                                    </td>
-
-                                    <td style={styles.td}>
-                                        {product.category}
-                                    </td>
-
-                                    <td style={styles.td}>
-                                        ₹{product.price}
-                                    </td>
-
-                                    <td style={styles.td}>
-                                        {product.stockQuantity}
-                                    </td>
-
-                                    <td style={styles.td}>
-                                        {product.sellerId}
-                                    </td>
-
-                                    <td style={styles.td}>
-
-                                        <button
-                                            style={styles.deleteButton}
-                                            onClick={() =>
-                                                removeProduct(product.id)
-                                            }
-                                        >
-                                            Remove
-                                        </button>
-
-                                    </td>
-
-                                </tr>
-
-                            ))}
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            )}
+            </main>
 
         </div>
+
     );
+
 }
 
-
-// ==========================================
-// STYLES
-// ==========================================
-
-const styles = {
-
-    page: {
-        minHeight: "100vh",
-        backgroundColor: "#f4f6f8",
-        padding: "20px",
-        fontFamily: "Arial, sans-serif"
-    },
-
-    header: {
-        backgroundColor: "#222",
-        color: "white",
-        padding: "20px",
-        borderRadius: "10px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center"
-    },
-
-    logoutButton: {
-        backgroundColor: "#dc3545",
-        color: "white",
-        border: "none",
-        padding: "10px 18px",
-        borderRadius: "6px",
-        cursor: "pointer"
-    },
-
-    message: {
-        backgroundColor: "#fff3cd",
-        padding: "12px",
-        marginTop: "15px",
-        borderRadius: "6px"
-    },
-
-    navigation: {
-        display: "flex",
-        gap: "10px",
-        marginTop: "20px",
-        marginBottom: "20px"
-    },
-
-    navButton: {
-        padding: "12px 20px",
-        border: "none",
-        borderRadius: "6px",
-        cursor: "pointer",
-        backgroundColor: "#ddd"
-    },
-
-    activeButton: {
-        padding: "12px 20px",
-        border: "none",
-        borderRadius: "6px",
-        cursor: "pointer",
-        backgroundColor: "#007bff",
-        color: "white"
-    },
-
-    section: {
-        backgroundColor: "white",
-        padding: "20px",
-        borderRadius: "10px",
-        overflowX: "auto"
-    },
-
-    table: {
-        width: "100%",
-        borderCollapse: "collapse",
-        marginTop: "15px"
-    },
-
-    th: {
-        border: "1px solid #ddd",
-        padding: "12px",
-        backgroundColor: "#eee",
-        textAlign: "left"
-    },
-
-    td: {
-        border: "1px solid #ddd",
-        padding: "12px"
-    },
-
-    deleteButton: {
-        backgroundColor: "#dc3545",
-        color: "white",
-        border: "none",
-        padding: "8px 12px",
-        borderRadius: "5px",
-        cursor: "pointer"
-    },
-
-    center: {
-        textAlign: "center",
-        marginTop: "100px"
-    }
-};
 
 export default AdminDashboard;
