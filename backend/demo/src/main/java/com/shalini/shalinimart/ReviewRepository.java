@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.shalini.shalinimart;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -9,8 +9,6 @@ public interface ReviewRepository
         extends JpaRepository<Review, Integer> {
 
     List<Review> findByProductId(int productId);
-
-    List<Review> findByCustomerId(int customerId);
 
     Optional<Review> findByProductIdAndCustomerId(
             int productId,
