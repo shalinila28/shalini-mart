@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.shalini.shalinimart;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
