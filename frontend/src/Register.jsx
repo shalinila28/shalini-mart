@@ -61,17 +61,17 @@ function Register() {
                     headers: {
                         "Content-Type": "application/json"
                     },
-
+                    credentials: "include",
                     body: JSON.stringify(formData)
                 }
             );
 
             const result = await response.text();
 
-            if (!response.ok) {
+            if (!response.ok || !result.toLowerCase().includes("successful")) {
 
                 setMessage(
-                    "❌ " + result
+                    "❌ " + (result || "Registration failed.")
                 );
 
                 setLoading(false);

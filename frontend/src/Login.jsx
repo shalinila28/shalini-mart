@@ -32,6 +32,7 @@ function Login() {
                     headers: {
                         "Content-Type": "application/json"
                     },
+                    credentials: "include",
                     body: JSON.stringify({
                         email: email,
                         password: password
@@ -39,13 +40,29 @@ function Login() {
                 }
             );
 
-            const data = await response.json();
+            const rawText = await response.text();
+            let data = null;
+            try {
+                data = JSON.parse(rawText);
+            } catch {
+                data = null;
+            }
 
             if (!response.ok) {
                 setMessage(
-                    data.message || "Invalid email or password."
+                    (data && data.message) || rawText || "Invalid email or password."
                 );
-                setLoading(false);
+                return;
+            }
+
+            // If backend returned a plain text response with HTTP 200 (e.g. "Invalid Email or Password")
+            if (!data || typeof data !== "object") {
+                setMessage(rawText || "Invalid email or password.");
+                return;
+            }
+
+            if (data.error || (data.message && !data.role)) {
+                setMessage(data.message || data.error);
                 return;
             }
 
@@ -56,13 +73,14 @@ function Login() {
             );
 
             // Role-based navigation
-            if (data.role === "CUSTOMER") {
+            const role = data.role ? String(data.role).toUpperCase() : "";
+            if (role === "CUSTOMER") {
                 navigate("/customer-dashboard");
             }
-            else if (data.role === "SELLER") {
+            else if (role === "SELLER") {
                 navigate("/seller-dashboard");
             }
-            else if (data.role === "ADMIN") {
+            else if (role === "ADMIN") {
                 navigate("/admin-dashboard");
             }
             else {
@@ -71,7 +89,7 @@ function Login() {
 
         } catch (error) {
 
-            console.error(error);
+            console.error("Login request failed:", error);
 
             setMessage(
                 "Cannot connect to backend. Please start Spring Boot."
