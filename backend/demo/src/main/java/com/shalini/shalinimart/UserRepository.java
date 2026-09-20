@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.shalini.shalinimart;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
