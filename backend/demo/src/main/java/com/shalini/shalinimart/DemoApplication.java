@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.shalini.shalinimart;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
