@@ -1,0 +1,11 @@
+target/
+build/
+.git/
+.gitignore
+.idea/
+*.iml
+.mvn/
+*.md
+.env*
+.DS_Store
+Thumbs.db
