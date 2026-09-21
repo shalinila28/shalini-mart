@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Dashboard.css"; // Import the CSS file for styling
 import CustomerReviews from "./CustomerReviews";
+import { API_BASE_URL } from "./config";
 
 function CustomerDashboard() {
 
@@ -80,7 +81,7 @@ function CustomerDashboard() {
     useEffect(() => {
 
         fetch(
-            "https://shalini-mart-production.up.railway.app/api/products"
+            `${API_BASE_URL}/api/products`
         )
             .then(response => {
 
@@ -145,7 +146,7 @@ function CustomerDashboard() {
     const loadCartCount = () => {
 
         fetch(
-            `https://shalini-mart-production.up.railway.app/api/cart/${customerId}`
+            `${API_BASE_URL}/api/cart/${customerId}`
         )
             .then(response => {
 
@@ -194,7 +195,7 @@ function CustomerDashboard() {
     ) => {
 
         fetch(
-            `https://shalini-mart-production.up.railway.app/api/reviews/product/${productId}`
+            `${API_BASE_URL}/api/reviews/product/${productId}`
         )
             .then(response => {
 
@@ -240,7 +241,7 @@ function CustomerDashboard() {
         }
 
         fetch(
-            `https://shalini-mart-production.up.railway.app/api/reviews/can-review?customerId=${customerId}&productId=${productId}`
+            `${API_BASE_URL}/api/reviews/can-review?customerId=${customerId}&productId=${productId}`
         )
             .then(response => {
 
@@ -313,7 +314,7 @@ function CustomerDashboard() {
 
 
         fetch(
-            "https://shalini-mart-production.up.railway.app/api/cart",
+            `${API_BASE_URL}/api/cart`,
             {
                 method: "POST",
 
@@ -428,7 +429,7 @@ function CustomerDashboard() {
 
 
         fetch(
-            "https://shalini-mart-production.up.railway.app/api/reviews",
+            `${API_BASE_URL}/api/reviews`,
             {
                 method: "POST",
 
@@ -569,7 +570,7 @@ function CustomerDashboard() {
 
 
         fetch(
-            `https://shalini-mart-production.up.railway.app/api/reviews/${review.id}?customerId=${customerId}`,
+            `${API_BASE_URL}/api/reviews/${review.id}?customerId=${customerId}`,
             {
                 method: "PUT",
 
@@ -645,7 +646,7 @@ function CustomerDashboard() {
 
 
         fetch(
-            `https://shalini-mart-production.up.railway.app/api/reviews/${review.id}?customerId=${customerId}`,
+            `${API_BASE_URL}/api/reviews/${review.id}?customerId=${customerId}`,
             {
                 method: "DELETE"
             }

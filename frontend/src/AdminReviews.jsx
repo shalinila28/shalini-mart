@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "./config";
 
 function AdminReviews() {
 
@@ -24,29 +25,18 @@ function AdminReviews() {
             return;
         }
 
-        try {
+        const user =
+            JSON.parse(savedUser);
 
-            const user =
-                JSON.parse(savedUser);
-
-            if (
-                !user.role ||
-                user.role.toUpperCase() !== "ADMIN"
-            ) {
-                navigate("/");
-                return;
-            }
-
-            loadReviews();
-
-        } catch (error) {
-
-            localStorage.removeItem(
-                "loggedInUser"
-            );
-
-            navigate("/login");
+        if (
+            !user.role ||
+            user.role.toUpperCase() !== "ADMIN"
+        ) {
+            navigate("/");
+            return;
         }
+
+        loadReviews();
 
     }, [navigate]);
 
@@ -62,7 +52,7 @@ function AdminReviews() {
             setLoading(true);
 
             const response = await fetch(
-                "https://shalini-mart-production.up.railway.app/api/admin/reviews"
+                `${API_BASE_URL}/api/admin/reviews`
             );
 
             if (!response.ok) {
@@ -111,7 +101,7 @@ function AdminReviews() {
         try {
 
             const response = await fetch(
-                `https://shalini-mart-production.up.railway.app/api/admin/reviews/${id}`,
+                `${API_BASE_URL}/api/admin/reviews/${id}`,
                 {
                     method: "DELETE"
                 }

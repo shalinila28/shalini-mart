@@ -131,29 +131,13 @@ function AddProduct() {
         };
 
         try {
-            // Try railway URL first or configured base URL
-            const targetUrl = API_BASE_URL
-                ? `${API_BASE_URL}/api/products`
-                : "https://shalini-mart-production.up.railway.app/api/products";
-
-            let response = await fetch(targetUrl, {
+            const response = await fetch(`${API_BASE_URL}/api/products`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify(requestBody)
             });
-
-            if (!response.ok && targetUrl.includes("localhost")) {
-                // Fallback to Railway if local fails
-                response = await fetch("https://shalini-mart-production.up.railway.app/api/products", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(requestBody)
-                });
-            }
 
             const responseText = await response.text();
 

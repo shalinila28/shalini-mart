@@ -26,21 +26,21 @@ function Login() {
 
         try {
 
-            const response = await fetch(
+            let response;
+            const payload = {
+                email: email.trim(),
+                password: password
+            };
+
+            response = await fetch(
                 `${API_BASE_URL}/api/login`,
                 {
                     method: "POST",
-
                     headers: {
                         "Content-Type": "application/json"
                     },
-
                     credentials: "include",
-
-                    body: JSON.stringify({
-                        email: email.trim(),
-                        password: password
-                    })
+                    body: JSON.stringify(payload)
                 }
             );
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "./config";
 
 function AdminProducts() {
 
@@ -24,29 +25,18 @@ function AdminProducts() {
             return;
         }
 
-        try {
+        const user =
+            JSON.parse(savedUser);
 
-            const user =
-                JSON.parse(savedUser);
-
-            if (
-                !user.role ||
-                user.role.toUpperCase() !== "ADMIN"
-            ) {
-                navigate("/");
-                return;
-            }
-
-            loadProducts();
-
-        } catch (error) {
-
-            localStorage.removeItem(
-                "loggedInUser"
-            );
-
-            navigate("/login");
+        if (
+            !user.role ||
+            user.role.toUpperCase() !== "ADMIN"
+        ) {
+            navigate("/");
+            return;
         }
+
+        loadProducts();
 
     }, [navigate]);
 
@@ -62,7 +52,7 @@ function AdminProducts() {
             setLoading(true);
 
             const response = await fetch(
-                "https://shalini-mart-production.up.railway.app/api/admin/products"
+                `${API_BASE_URL}/api/admin/products`
             );
 
             if (!response.ok) {
@@ -111,7 +101,7 @@ function AdminProducts() {
         try {
 
             const response = await fetch(
-                `https://shalini-mart-production.up.railway.app/api/admin/products/${id}`,
+                `${API_BASE_URL}/api/admin/products/${id}`,
                 {
                     method: "DELETE"
                 }

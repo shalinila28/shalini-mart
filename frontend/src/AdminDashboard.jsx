@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "./config";
 
 import "./Dashboard.css";
 
@@ -77,7 +78,7 @@ function AdminDashboard() {
 
 
             const response = await fetch(
-                "https://shalini-mart-production.up.railway.app/api/admin/summary"
+                `${API_BASE_URL}/api/admin/summary`
             );
 
 

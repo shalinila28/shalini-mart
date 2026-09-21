@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { API_BASE_URL } from "./config";
 
 function CustomerReviews({ productId }) {
 
@@ -47,7 +48,7 @@ function CustomerReviews({ productId }) {
 
             const response =
                 await fetch(
-                    `https://shalini-mart-production.up.railway.app/api/reviews/product/${productId}`
+                    `${API_BASE_URL}/api/reviews/product/${productId}`
                 );
 
             if (!response.ok) {
@@ -113,7 +114,7 @@ function CustomerReviews({ productId }) {
                 response =
                     await fetch(
 
-                        `https://shalini-mart-production.up.railway.app/api/reviews/${editingId}?customerId=${customerId}`,
+                        `${API_BASE_URL}/api/reviews/${editingId}?customerId=${customerId}`,
 
                         {
                             method: "PUT",
@@ -148,7 +149,7 @@ function CustomerReviews({ productId }) {
                 response =
                     await fetch(
 
-                        "https://shalini-mart-production.up.railway.app/api/reviews",
+                        `${API_BASE_URL}/api/reviews`,
 
                         {
                             method: "POST",
@@ -295,7 +296,7 @@ function CustomerReviews({ productId }) {
             const response =
                 await fetch(
 
-                    `https://shalini-mart-production.up.railway.app/api/reviews/${review.id}?customerId=${customerId}`,
+                    `${API_BASE_URL}/api/reviews/${review.id}?customerId=${customerId}`,
 
                     {
                         method: "DELETE"

@@ -3,6 +3,7 @@ import {
     useNavigate,
     useParams
 } from "react-router-dom";
+import { API_BASE_URL } from "./config";
 
 function EditProduct() {
 
@@ -38,7 +39,7 @@ function EditProduct() {
     useEffect(() => {
 
         fetch(
-            "https://shalini-mart-production.up.railway.app/api/products"
+            `${API_BASE_URL}/api/products`
         )
 
             .then(response =>
@@ -142,7 +143,7 @@ function EditProduct() {
 
             const response = await fetch(
 
-                `https://shalini-mart-production.up.railway.app/api/products/${id}?sellerId=${sellerId}`,
+                `${API_BASE_URL}/api/products/${id}?sellerId=${sellerId}`,
 
                 {
                     method: "PUT",

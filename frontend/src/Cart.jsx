@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "./config";
 
 function Cart() {
 
@@ -30,7 +31,7 @@ function Cart() {
 
     useEffect(() => {
 
-        fetch("https://shalini-mart-production.up.railway.app/api/products")
+        fetch(`${API_BASE_URL}/api/products`)
             .then(response => {
 
                 if (!response.ok) {
@@ -73,7 +74,7 @@ function Cart() {
     const loadCart = () => {
 
         fetch(
-            `https://shalini-mart-production.up.railway.app/api/cart/${customerId}`
+            `${API_BASE_URL}/api/cart/${customerId}`
         )
             .then(response => {
 
@@ -114,7 +115,7 @@ function Cart() {
         }
 
         fetch(
-            `https://shalini-mart-production.up.railway.app/api/cart/${cartItem.id}`,
+            `${API_BASE_URL}/api/cart/${cartItem.id}`,
             {
                 method: "PUT",
 
@@ -173,7 +174,7 @@ function Cart() {
         }
 
         fetch(
-            `https://shalini-mart-production.up.railway.app/api/cart/${id}`,
+            `${API_BASE_URL}/api/cart/${id}`,
             {
                 method: "DELETE"
             }
@@ -251,7 +252,7 @@ function Cart() {
         }
 
         fetch(
-            `https://shalini-mart-production.up.railway.app/api/orders/checkout/${customerId}`,
+            `${API_BASE_URL}/api/orders/checkout/${customerId}`,
             {
                 method: "POST"
             }

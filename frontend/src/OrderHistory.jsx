@@ -27,21 +27,8 @@ function OrderHistory() {
     const customerId = loggedInUser?.id;
     const customerName = loggedInUser?.username || "Customer";
 
-    const BASE = API_BASE_URL || "https://shalini-mart-production.up.railway.app";
-    const RAILWAY_BASE = "https://shalini-mart-production.up.railway.app";
-
-    // Helper for fetch with fallback to Railway if local fails
     const fetchApi = async (path, options = {}) => {
-        try {
-            const url = `${BASE}${path}`;
-            let res = await fetch(url, options);
-            if (!res.ok && url.includes("localhost")) {
-                res = await fetch(`${RAILWAY_BASE}${path}`, options);
-            }
-            return res;
-        } catch (err) {
-            return await fetch(`${RAILWAY_BASE}${path}`, options);
-        }
+        return await fetch(`${API_BASE_URL}${path}`, options);
     };
 
     // =====================================================

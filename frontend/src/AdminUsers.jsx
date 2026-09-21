@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "./config";
 
 function AdminUsers() {
 
@@ -47,7 +48,7 @@ function AdminUsers() {
         try {
 
             const response = await fetch(
-                "https://shalini-mart-production.up.railway.app/api/admin/users"
+                `${API_BASE_URL}/api/admin/users`
             );
 
             if (!response.ok) {
@@ -107,7 +108,7 @@ function AdminUsers() {
         try {
 
             const response = await fetch(
-                `https://shalini-mart-production.up.railway.app/api/admin/users/${id}`,
+                `${API_BASE_URL}/api/admin/users/${id}`,
                 {
                     method: "DELETE"
                 }

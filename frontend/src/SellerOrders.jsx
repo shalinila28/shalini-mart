@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "./config";
 
 function SellerOrders() {
 
@@ -30,7 +31,7 @@ function SellerOrders() {
         try {
 
             const response = await fetch(
-                `https://shalini-mart-production.up.railway.app/api/orders/seller/${sellerId}`
+                `${API_BASE_URL}/api/orders/seller/${sellerId}`
             );
 
 

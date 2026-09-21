@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "./config";
 
 function SellerProducts() {
 
@@ -91,7 +92,7 @@ function SellerProducts() {
         try {
 
             const response = await fetch(
-                "https://shalini-mart-production.up.railway.app/api/products"
+                `${API_BASE_URL}/api/products`
             );
 
             const text = await response.text();
@@ -283,7 +284,7 @@ function SellerProducts() {
             if (editingId !== null) {
 
                 url =
-                    `https://shalini-mart-production.up.railway.app/api/products/${editingId}?sellerId=${sellerId}`;
+                    `${API_BASE_URL}/api/products/${editingId}?sellerId=${sellerId}`;
 
                 method = "PUT";
 
@@ -297,7 +298,7 @@ function SellerProducts() {
             else {
 
                 url =
-                    "https://shalini-mart-production.up.railway.app/api/products";
+                    `${API_BASE_URL}/api/products`;
 
                 method = "POST";
 
@@ -566,7 +567,7 @@ function SellerProducts() {
             const response =
                 await fetch(
 
-                    `https://shalini-mart-production.up.railway.app/api/products/${id}?sellerId=${sellerId}`,
+                    `${API_BASE_URL}/api/products/${id}?sellerId=${sellerId}`,
 
                     {
                         method: "DELETE"
