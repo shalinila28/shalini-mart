@@ -29,19 +29,24 @@ function Login() {
                 "https://shalini-mart-production.up.railway.app/api/login",
                 {
                     method: "POST",
+
                     headers: {
                         "Content-Type": "application/json"
                     },
+
                     credentials: "include",
+
                     body: JSON.stringify({
-                        email: email,
+                        email: email.trim(),
                         password: password
                     })
                 }
             );
 
             const rawText = await response.text();
+
             let data = null;
+
             try {
                 data = JSON.parse(rawText);
             } catch {
@@ -49,53 +54,116 @@ function Login() {
             }
 
             if (!response.ok) {
+
                 setMessage(
-                    (data && data.message) || rawText || "Invalid email or password."
+                    (data && data.message)
+                    || rawText
+                    || "Invalid email or password."
                 );
+
                 return;
             }
 
-            // If backend returned a plain text response with HTTP 200 (e.g. "Invalid Email or Password")
+            // Backend should return user object
             if (!data || typeof data !== "object") {
-                setMessage(rawText || "Invalid email or password.");
+
+                setMessage(
+                    rawText || "Invalid email or password."
+                );
+
                 return;
             }
 
-            if (data.error || (data.message && !data.role)) {
-                setMessage(data.message || data.error);
+            if (data.error) {
+
+                setMessage(
+                    data.message || data.error
+                );
+
                 return;
             }
 
-            // Save logged-in user
+            // ==========================================
+            // IMPORTANT FIX
+            // Normalize role BEFORE storing user
+            // ==========================================
+
+            const normalizedRole =
+                data.role
+                    ? String(data.role).trim().toUpperCase()
+                    : "";
+
+            if (
+                normalizedRole !== "CUSTOMER" &&
+                normalizedRole !== "SELLER" &&
+                normalizedRole !== "ADMIN"
+            ) {
+
+                setMessage("Invalid user role.");
+
+                return;
+            }
+
+            // Create clean user object
+            const loggedInUser = {
+
+                id: data.id,
+
+                username: data.username,
+
+                email: data.email,
+
+                role: normalizedRole
+            };
+
+            // ==========================================
+            // SAVE CORRECT ROLE IN LOCAL STORAGE
+            // ==========================================
+
             localStorage.setItem(
                 "loggedInUser",
-                JSON.stringify(data)
+                JSON.stringify(loggedInUser)
             );
 
-            // Role-based navigation
-            const role = data.role ? String(data.role).toUpperCase() : "";
-            if (role === "CUSTOMER") {
+            console.log(
+                "Logged in user:",
+                loggedInUser
+            );
+
+            // ==========================================
+            // ROLE BASED NAVIGATION
+            // ==========================================
+
+            if (normalizedRole === "CUSTOMER") {
+
                 navigate("/customer-dashboard");
+
             }
-            else if (role === "SELLER") {
+            else if (normalizedRole === "SELLER") {
+
                 navigate("/seller-dashboard");
+
             }
-            else if (role === "ADMIN") {
+            else if (normalizedRole === "ADMIN") {
+
                 navigate("/admin-dashboard");
-            }
-            else {
-                setMessage("Invalid user role.");
+
             }
 
-        } catch (error) {
+        }
+        catch (error) {
 
-            console.error("Login request failed:", error);
+            console.error(
+                "Login request failed:",
+                error
+            );
 
             setMessage(
-                "Cannot connect to backend. Please start Spring Boot."
+                "Cannot connect to backend."
             );
 
-        } finally {
+        }
+        finally {
 
             setLoading(false);
         }
@@ -128,7 +196,10 @@ function Login() {
                 </p>
 
                 <div style={styles.feature}>
-                    <span>🛍️</span>
+                    <span style={styles.featureIcon}>
+                        🛍️
+                    </span>
+
                     <div>
                         <strong>Easy Shopping</strong>
                         <small>Find products you love</small>
@@ -136,7 +207,10 @@ function Login() {
                 </div>
 
                 <div style={styles.feature}>
-                    <span>📦</span>
+                    <span style={styles.featureIcon}>
+                        📦
+                    </span>
+
                     <div>
                         <strong>Track Orders</strong>
                         <small>Keep track of your purchases</small>
@@ -144,7 +218,10 @@ function Login() {
                 </div>
 
                 <div style={styles.feature}>
-                    <span>🔐</span>
+                    <span style={styles.featureIcon}>
+                        🔐
+                    </span>
+
                     <div>
                         <strong>Secure Account</strong>
                         <small>Your account stays protected</small>
@@ -175,8 +252,6 @@ function Login() {
 
                     <form onSubmit={handleLogin}>
 
-                        {/* EMAIL */}
-
                         <label style={styles.label}>
                             Email Address
                         </label>
@@ -199,8 +274,6 @@ function Login() {
 
                         </div>
 
-
-                        {/* PASSWORD */}
 
                         <label style={styles.label}>
                             Password
@@ -225,8 +298,6 @@ function Login() {
                         </div>
 
 
-                        {/* MESSAGE */}
-
                         {message && (
 
                             <div style={styles.message}>
@@ -235,8 +306,6 @@ function Login() {
 
                         )}
 
-
-                        {/* LOGIN */}
 
                         <button
                             type="submit"
@@ -252,8 +321,6 @@ function Login() {
 
                     </form>
 
-
-                    {/* REGISTER */}
 
                     <p style={styles.registerText}>
 
@@ -343,7 +410,7 @@ const styles = {
         background: "rgba(255,255,255,0.12)"
     },
 
-    featurespan: {
+    featureIcon: {
         fontSize: "30px"
     },
 
@@ -365,7 +432,8 @@ const styles = {
         boxSizing: "border-box",
         background: "white",
         borderRadius: "25px",
-        boxShadow: "0 20px 50px rgba(15,23,42,0.15)"
+        boxShadow:
+            "0 20px 50px rgba(15,23,42,0.15)"
     },
 
     lock: {
@@ -400,8 +468,6 @@ const styles = {
         marginBottom: "8px",
         marginTop: "20px"
     },
-
-    /* ONE SINGLE BOX */
 
     inputBox: {
         width: "100%",
@@ -458,7 +524,8 @@ const styles = {
         fontSize: "17px",
         fontWeight: "bold",
         cursor: "pointer",
-        boxShadow: "0 8px 20px rgba(21,87,214,0.3)"
+        boxShadow:
+            "0 8px 20px rgba(21,87,214,0.3)"
     },
 
     registerText: {

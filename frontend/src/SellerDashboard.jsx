@@ -5,47 +5,110 @@ function SellerDashboard() {
 
     const navigate = useNavigate();
 
-    const loggedInUser =
-        JSON.parse(localStorage.getItem("loggedInUser"));
+    let loggedInUser = null;
 
-    // ------------------------------------------
-    // LOGIN CHECK
-    // ------------------------------------------
+    try {
 
-    if (!loggedInUser) {
-        navigate("/login");
-        return null;
-    }
+        loggedInUser =
+            JSON.parse(
+                localStorage.getItem("loggedInUser")
+            );
 
-    // ------------------------------------------
-    // SELLER CHECK
-    // ------------------------------------------
+    } catch (error) {
 
-    if (loggedInUser.role !== "SELLER") {
-        navigate("/");
-        return null;
-    }
-
-    // ------------------------------------------
-    // LOGOUT
-    // ------------------------------------------
-
-    const logout = () => {
+        console.error(
+            "Invalid loggedInUser data",
+            error
+        );
 
         localStorage.removeItem("loggedInUser");
+    }
+
+
+    // ==========================================
+    // LOGIN CHECK
+    // ==========================================
+
+    if (!loggedInUser) {
 
         navigate("/login");
+
+        return null;
+    }
+
+
+    // ==========================================
+    // NORMALIZE ROLE
+    // ==========================================
+
+    const role =
+        loggedInUser.role
+            ? String(loggedInUser.role)
+                .trim()
+                .toUpperCase()
+            : "";
+
+
+    // ==========================================
+    // SELLER CHECK
+    // ==========================================
+
+    if (role !== "SELLER") {
+
+        navigate("/");
+
+        return null;
+    }
+
+
+    // ==========================================
+    // LOGOUT
+    // ==========================================
+
+    const logout = async () => {
+
+        try {
+
+            await fetch(
+                "https://shalini-mart-production.up.railway.app/api/logout",
+                {
+                    method: "POST",
+                    credentials: "include"
+                }
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Logout request failed",
+                error
+            );
+
+        } finally {
+
+            localStorage.removeItem(
+                "loggedInUser"
+            );
+
+            localStorage.removeItem(
+                "token"
+            );
+
+            navigate("/login");
+        }
     };
+
 
     return (
 
         <div style={styles.page}>
 
-            {/* ================= HEADER ================= */}
+            {/* HEADER */}
 
             <div style={styles.header}>
 
                 <div>
+
                     <h1 style={styles.logo}>
                         🛒 ShaliniMart
                     </h1>
@@ -60,7 +123,9 @@ function SellerDashboard() {
                             {loggedInUser.username}
                         </strong>
                     </p>
+
                 </div>
+
 
                 <button
                     style={styles.logout}
@@ -72,14 +137,14 @@ function SellerDashboard() {
             </div>
 
 
-            {/* ================= TITLE ================= */}
+            {/* TITLE */}
 
             <h2 style={styles.sectionTitle}>
                 🏪 Seller Management
             </h2>
 
 
-            {/* ================= SELLER OPTIONS ================= */}
+            {/* OPTIONS */}
 
             <div style={styles.grid}>
 
@@ -107,8 +172,13 @@ function SellerDashboard() {
                     <button
                         style={styles.button}
                         onClick={(e) => {
+
                             e.stopPropagation();
-                            navigate("/seller/products/add");
+
+                            navigate(
+                                "/seller/products/add"
+                            );
+
                         }}
                     >
                         Add Product
@@ -141,8 +211,13 @@ function SellerDashboard() {
                     <button
                         style={styles.button}
                         onClick={(e) => {
+
                             e.stopPropagation();
-                            navigate("/seller/products");
+
+                            navigate(
+                                "/seller/products"
+                            );
+
                         }}
                     >
                         View Products
@@ -151,7 +226,7 @@ function SellerDashboard() {
                 </div>
 
 
-                {/* INCOMING ORDERS */}
+                {/* ORDERS */}
 
                 <div
                     style={styles.card}
@@ -175,8 +250,13 @@ function SellerDashboard() {
                     <button
                         style={styles.button}
                         onClick={(e) => {
+
                             e.stopPropagation();
-                            navigate("/seller/orders");
+
+                            navigate(
+                                "/seller/orders"
+                            );
+
                         }}
                     >
                         View Orders
@@ -190,10 +270,6 @@ function SellerDashboard() {
     );
 }
 
-
-/* =====================================================
-   STYLES
-===================================================== */
 
 const styles = {
 
