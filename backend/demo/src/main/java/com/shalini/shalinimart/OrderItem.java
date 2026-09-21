@@ -1,68 +1,67 @@
 package com.shalini.shalinimart;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "order_items")
+@Table(name = "orders")
 public class OrderItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private int orderId;
+    private int customerId;
 
-    private int productId;
+    private double totalAmount;
 
-    private int quantity;
+    private String status;
 
-    private double price;
+    private LocalDateTime orderDate;
 
     public OrderItem() {
     }
 
-    public OrderItem(int orderId, int productId,
-                     int quantity, double price) {
-
-        this.orderId = orderId;
-        this.productId = productId;
-        this.quantity = quantity;
-        this.price = price;
+    public OrderItem(int customerId, double totalAmount, String status) {
+        this.customerId = customerId;
+        this.totalAmount = totalAmount;
+        this.status = status;
+        this.orderDate = LocalDateTime.now();
     }
 
     public int getId() {
         return id;
     }
 
-    public int getOrderId() {
-        return orderId;
+    public int getCustomerId() {
+        return customerId;
     }
 
-    public void setOrderId(int orderId) {
-        this.orderId = orderId;
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
     }
 
-    public int getProductId() {
-        return productId;
+    public double getTotalAmount() {
+        return totalAmount;
     }
 
-    public void setProductId(int productId) {
-        this.productId = productId;
+    public void setTotalAmount(double totalAmount) {
+        this.totalAmount = totalAmount;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public String getStatus() {
+        return status;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
-    public double getPrice() {
-        return price;
+    public LocalDateTime getOrderDate() {
+        return orderDate;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
+    public void setOrderDate(LocalDateTime orderDate) {
+        this.orderDate = orderDate;
     }
 }

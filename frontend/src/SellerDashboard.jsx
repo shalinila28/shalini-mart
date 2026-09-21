@@ -5,105 +5,47 @@ function SellerDashboard() {
 
     const navigate = useNavigate();
 
-    let loggedInUser = null;
+    const loggedInUser =
+        JSON.parse(localStorage.getItem("loggedInUser"));
 
-    try {
-
-        loggedInUser =
-            JSON.parse(
-                localStorage.getItem("loggedInUser")
-            );
-
-    } catch (error) {
-
-        console.error(
-            "Invalid loggedInUser data",
-            error
-        );
-
-        localStorage.removeItem("loggedInUser");
-    }
-
-
-    // ==========================================
+    // ------------------------------------------
     // LOGIN CHECK
-    // ==========================================
+    // ------------------------------------------
 
     if (!loggedInUser) {
-
         navigate("/login");
-
         return null;
     }
 
-
-    // ==========================================
-    // NORMALIZE ROLE
-    // ==========================================
-
-    const role =
-        loggedInUser.role
-            ? String(loggedInUser.role)
-                .trim()
-                .toUpperCase()
-            : "";
-
-
-    // ==========================================
+    // ------------------------------------------
     // SELLER CHECK
-    // ==========================================
+    // ------------------------------------------
+
+    const role = loggedInUser.role
+        ? String(loggedInUser.role).trim().toUpperCase()
+        : "";
 
     if (role !== "SELLER") {
-
         navigate("/");
-
         return null;
     }
 
-
-    // ==========================================
+    // ------------------------------------------
     // LOGOUT
-    // ==========================================
+    // ------------------------------------------
 
-    const logout = async () => {
+    const logout = () => {
 
-        try {
+        localStorage.removeItem("loggedInUser");
 
-            await fetch(
-                "https://shalini-mart-production.up.railway.app/api/logout",
-                {
-                    method: "POST",
-                    credentials: "include"
-                }
-            );
-
-        } catch (error) {
-
-            console.error(
-                "Logout request failed",
-                error
-            );
-
-        } finally {
-
-            localStorage.removeItem(
-                "loggedInUser"
-            );
-
-            localStorage.removeItem(
-                "token"
-            );
-
-            navigate("/login");
-        }
+        navigate("/login");
     };
-
 
     return (
 
         <div style={styles.page}>
 
-            {/* HEADER */}
+            {/* ================= HEADER ================= */}
 
             <div style={styles.header}>
 
@@ -126,7 +68,6 @@ function SellerDashboard() {
 
                 </div>
 
-
                 <button
                     style={styles.logout}
                     onClick={logout}
@@ -137,64 +78,20 @@ function SellerDashboard() {
             </div>
 
 
-            {/* TITLE */}
+            {/* ================= TITLE ================= */}
 
             <h2 style={styles.sectionTitle}>
                 🏪 Seller Management
             </h2>
 
 
-            {/* OPTIONS */}
+            {/* ================= SELLER OPTIONS ================= */}
 
             <div style={styles.grid}>
 
-                {/* ADD PRODUCT */}
+                {/* ================= MY PRODUCTS ================= */}
 
-                <div
-                    style={styles.card}
-                    onClick={() =>
-                        navigate("/seller/products/add")
-                    }
-                >
-
-                    <div style={styles.icon}>
-                        ➕
-                    </div>
-
-                    <h2 style={styles.cardTitle}>
-                        Add Product
-                    </h2>
-
-                    <p style={styles.cardText}>
-                        Add a new product to ShaliniMart
-                    </p>
-
-                    <button
-                        style={styles.button}
-                        onClick={(e) => {
-
-                            e.stopPropagation();
-
-                            navigate(
-                                "/seller/products/add"
-                            );
-
-                        }}
-                    >
-                        Add Product
-                    </button>
-
-                </div>
-
-
-                {/* MY PRODUCTS */}
-
-                <div
-                    style={styles.card}
-                    onClick={() =>
-                        navigate("/seller/products")
-                    }
-                >
+                <div style={styles.card}>
 
                     <div style={styles.icon}>
                         🛍️
@@ -205,35 +102,40 @@ function SellerDashboard() {
                     </h2>
 
                     <p style={styles.cardText}>
-                        View, edit and delete your products
+                        Add new products or view, edit and
+                        delete your existing products.
                     </p>
 
+
+                    {/* ADD PRODUCT BUTTON */}
+
                     <button
-                        style={styles.button}
-                        onClick={(e) => {
-
-                            e.stopPropagation();
-
-                            navigate(
-                                "/seller/products"
-                            );
-
-                        }}
+                        style={styles.addButton}
+                        onClick={() =>
+                            navigate("/seller/products/add")
+                        }
                     >
-                        View Products
+                        ➕ Add Product
+                    </button>
+
+
+                    {/* VIEW PRODUCTS BUTTON */}
+
+                    <button
+                        style={styles.viewButton}
+                        onClick={() =>
+                            navigate("/seller/products")
+                        }
+                    >
+                        🛍️ View Products
                     </button>
 
                 </div>
 
 
-                {/* ORDERS */}
+                {/* ================= INCOMING ORDERS ================= */}
 
-                <div
-                    style={styles.card}
-                    onClick={() =>
-                        navigate("/seller/orders")
-                    }
-                >
+                <div style={styles.card}>
 
                     <div style={styles.icon}>
                         📦
@@ -244,22 +146,17 @@ function SellerDashboard() {
                     </h2>
 
                     <p style={styles.cardText}>
-                        View and manage customer orders
+                        View and manage customer orders.
                     </p>
 
+
                     <button
-                        style={styles.button}
-                        onClick={(e) => {
-
-                            e.stopPropagation();
-
-                            navigate(
-                                "/seller/orders"
-                            );
-
-                        }}
+                        style={styles.orderButton}
+                        onClick={() =>
+                            navigate("/seller/orders")
+                        }
                     >
-                        View Orders
+                        📦 View Orders
                     </button>
 
                 </div>
@@ -271,6 +168,10 @@ function SellerDashboard() {
 }
 
 
+/* =====================================================
+   STYLES
+===================================================== */
+
 const styles = {
 
     page: {
@@ -279,8 +180,12 @@ const styles = {
         fontFamily: "Arial, sans-serif",
         background:
             "linear-gradient(135deg, #eef2ff, #f8fafc)",
-        color: "#172033"
+        color: "#172033",
+        boxSizing: "border-box"
     },
+
+
+    /* ================= HEADER ================= */
 
     header: {
         background:
@@ -296,20 +201,24 @@ const styles = {
         marginBottom: "40px"
     },
 
+
     logo: {
         margin: "0 0 8px 0",
         fontSize: "32px"
     },
+
 
     title: {
         margin: "5px 0",
         fontSize: "25px"
     },
 
+
     welcome: {
         margin: "10px 0 0 0",
         fontSize: "17px"
     },
+
 
     logout: {
         backgroundColor: "#ef4444",
@@ -322,6 +231,9 @@ const styles = {
         cursor: "pointer"
     },
 
+
+    /* ================= SECTION ================= */
+
     sectionTitle: {
         textAlign: "center",
         fontSize: "28px",
@@ -329,14 +241,20 @@ const styles = {
         color: "#172554"
     },
 
+
+    /* ================= GRID ================= */
+
     grid: {
         display: "grid",
         gridTemplateColumns:
-            "repeat(auto-fit, minmax(280px, 1fr))",
+            "repeat(auto-fit, minmax(320px, 1fr))",
         gap: "30px",
-        maxWidth: "1100px",
+        maxWidth: "900px",
         margin: "auto"
     },
+
+
+    /* ================= CARD ================= */
 
     card: {
         backgroundColor: "white",
@@ -345,15 +263,15 @@ const styles = {
         textAlign: "center",
         boxShadow:
             "0 8px 25px rgba(0, 0, 0, 0.12)",
-        cursor: "pointer",
-        transition: "0.3s",
         border: "1px solid #e5e7eb"
     },
+
 
     icon: {
         fontSize: "55px",
         marginBottom: "15px"
     },
+
 
     cardTitle: {
         fontSize: "23px",
@@ -361,25 +279,66 @@ const styles = {
         marginBottom: "10px"
     },
 
+
     cardText: {
         color: "#475569",
         fontSize: "15px",
         lineHeight: "1.5",
-        minHeight: "45px"
+        minHeight: "45px",
+        marginBottom: "20px"
     },
 
-    button: {
-        marginTop: "20px",
+
+    /* ================= ADD PRODUCT ================= */
+
+    addButton: {
+        width: "100%",
+        marginTop: "8px",
+        padding: "13px 20px",
+        background:
+            "linear-gradient(135deg, #16a34a, #15803d)",
+        color: "white",
+        border: "none",
+        borderRadius: "10px",
+        fontSize: "15px",
+        fontWeight: "bold",
+        cursor: "pointer"
+    },
+
+
+    /* ================= VIEW PRODUCTS ================= */
+
+    viewButton: {
+        width: "100%",
+        marginTop: "12px",
+        padding: "13px 20px",
         background:
             "linear-gradient(135deg, #2563eb, #1d4ed8)",
         color: "white",
         border: "none",
-        padding: "13px 25px",
+        borderRadius: "10px",
+        fontSize: "15px",
+        fontWeight: "bold",
+        cursor: "pointer"
+    },
+
+
+    /* ================= ORDERS ================= */
+
+    orderButton: {
+        width: "100%",
+        marginTop: "20px",
+        padding: "13px 20px",
+        background:
+            "linear-gradient(135deg, #7c3aed, #6d28d9)",
+        color: "white",
+        border: "none",
         borderRadius: "10px",
         fontSize: "15px",
         fontWeight: "bold",
         cursor: "pointer"
     }
+
 };
 
 export default SellerDashboard;
