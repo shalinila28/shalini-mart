@@ -89,6 +89,34 @@ function SellerDashboard() {
 
             <div style={styles.grid}>
 
+                {/* ================= ADD PRODUCT ================= */}
+
+                <div style={styles.card}>
+
+                    <div style={styles.icon}>
+                        ➕
+                    </div>
+
+                    <h2 style={styles.cardTitle}>
+                        Add Product
+                    </h2>
+
+                    <p style={styles.cardText}>
+                        List new products to your store catalog with title, description, price, stock, category, and image.
+                    </p>
+
+                    <button
+                        style={styles.addButton}
+                        onClick={() =>
+                            navigate("/seller/products/add")
+                        }
+                    >
+                        ➕ Add Product
+                    </button>
+
+                </div>
+
+
                 {/* ================= MY PRODUCTS ================= */}
 
                 <div style={styles.card}>
@@ -102,24 +130,8 @@ function SellerDashboard() {
                     </h2>
 
                     <p style={styles.cardText}>
-                        Add new products or view, edit and
-                        delete your existing products.
+                        View all your active inventory items, edit pricing or details, and manage your product listings.
                     </p>
-
-
-                    {/* ADD PRODUCT BUTTON */}
-
-                    <button
-                        style={styles.addButton}
-                        onClick={() =>
-                            navigate("/seller/products/add")
-                        }
-                    >
-                        ➕ Add Product
-                    </button>
-
-
-                    {/* VIEW PRODUCTS BUTTON */}
 
                     <button
                         style={styles.viewButton}
@@ -127,7 +139,7 @@ function SellerDashboard() {
                             navigate("/seller/products")
                         }
                     >
-                        🛍️ View Products
+                        🛍️ View My Products
                     </button>
 
                 </div>
@@ -146,9 +158,8 @@ function SellerDashboard() {
                     </h2>
 
                     <p style={styles.cardText}>
-                        View and manage customer orders.
+                        View and manage customer orders placed for your products.
                     </p>
-
 
                     <button
                         style={styles.orderButton}

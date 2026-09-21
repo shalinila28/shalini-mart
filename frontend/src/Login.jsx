@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { API_BASE_URL } from "./config";
 
 function Login() {
 
@@ -26,7 +27,7 @@ function Login() {
         try {
 
             const response = await fetch(
-                "https://shalini-mart-production.up.railway.app/api/login",
+                `${API_BASE_URL}/api/login`,
                 {
                     method: "POST",
 

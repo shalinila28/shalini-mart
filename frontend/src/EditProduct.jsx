@@ -173,8 +173,7 @@ function EditProduct() {
                 "Product updated successfully!"
             );
 
-
-            navigate("/seller-products");
+            navigate("/seller/products");
 
         } catch (error) {
 
@@ -213,7 +212,11 @@ function EditProduct() {
     }
 
 
-    if (loggedInUser.role !== "SELLER") {
+    const role = loggedInUser.role
+        ? String(loggedInUser.role).trim().toUpperCase()
+        : "";
+
+    if (role !== "SELLER") {
 
         return (
             <div style={styles.center}>
@@ -234,7 +237,7 @@ function EditProduct() {
             <button
                 style={styles.backButton}
                 onClick={() =>
-                    navigate("/seller-products")
+                    navigate("/seller/products")
                 }
             >
                 ← My Products

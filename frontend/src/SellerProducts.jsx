@@ -24,6 +24,8 @@ function SellerProducts() {
 
     const [editingId, setEditingId] = useState(null);
 
+    const [showAddForm, setShowAddForm] = useState(false);
+
     const [message, setMessage] = useState("");
 
     const [loading, setLoading] = useState(false);
@@ -413,10 +415,9 @@ function SellerProducts() {
             });
 
 
-            // EXIT EDIT MODE
-
+            // EXIT EDIT / ADD MODE
             setEditingId(null);
-
+            setShowAddForm(false);
 
             // CLEAR FILE INPUT
 
@@ -614,6 +615,7 @@ function SellerProducts() {
     const cancelEdit = () => {
 
         setEditingId(null);
+        setShowAddForm(false);
 
         setProduct({
             ...emptyProduct
@@ -654,7 +656,7 @@ function SellerProducts() {
                     </h1>
 
                     <h2 style={styles.heading}>
-                        🛍️ Seller Products
+                        🛍️ My Products
                     </h2>
 
                     <p style={styles.welcome}>
@@ -666,200 +668,225 @@ function SellerProducts() {
 
                 </div>
 
+                <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
 
-                <button
-                    style={styles.backButton}
-                    onClick={() =>
-                        navigate(
-                            "/seller-dashboard"
-                        )
-                    }
-                >
-                    ← Dashboard
-                </button>
+                    <button
+                        style={styles.addProductHeaderBtn}
+                        onClick={() =>
+                            navigate("/seller/products/add")
+                        }
+                    >
+                        ➕ Add New Product
+                    </button>
+
+                    <button
+                        style={styles.backButton}
+                        onClick={() =>
+                            navigate(
+                                "/seller-dashboard"
+                            )
+                        }
+                    >
+                        ← Dashboard
+                    </button>
+
+                </div>
 
             </div>
 
 
             {/* =================================================
-                FORM
+                FORM (Shown when Editing or showAddForm is true)
             ================================================= */}
 
-            <form
-                style={styles.formCard}
-                onSubmit={handleSubmit}
-            >
+            {(editingId !== null || showAddForm) && (
 
-                <h2 style={styles.formTitle}>
-
-                    {editingId !== null
-                        ? "✏️ Edit Product"
-                        : "➕ Add New Product"}
-
-                </h2>
-
-
-                <label style={styles.label}>
-                    Product Name
-                </label>
-
-                <input
-                    style={styles.input}
-                    type="text"
-                    name="name"
-                    placeholder="Example: Premium Watch"
-                    value={product.name}
-                    onChange={handleChange}
-                    required
-                />
-
-
-                <label style={styles.label}>
-                    Description
-                </label>
-
-                <textarea
-                    style={styles.textarea}
-                    name="description"
-                    placeholder="Enter product description"
-                    value={product.description}
-                    onChange={handleChange}
-                    required
-                />
-
-
-                <label style={styles.label}>
-                    Price
-                </label>
-
-                <input
-                    style={styles.input}
-                    type="number"
-                    name="price"
-                    placeholder="₹ Price"
-                    value={product.price}
-                    onChange={handleChange}
-                    min="0"
-                    step="0.01"
-                    required
-                />
-
-
-                <label style={styles.label}>
-                    Stock Quantity
-                </label>
-
-                <input
-                    style={styles.input}
-                    type="number"
-                    name="stockQuantity"
-                    placeholder="Available quantity"
-                    value={product.stockQuantity}
-                    onChange={handleChange}
-                    min="0"
-                    step="1"
-                    required
-                />
-
-
-                <label style={styles.label}>
-                    Category
-                </label>
-
-                <input
-                    style={styles.input}
-                    type="text"
-                    name="category"
-                    placeholder="Example: Watches"
-                    value={product.category}
-                    onChange={handleChange}
-                    required
-                />
-
-
-                {/* IMAGE */}
-
-                <label style={styles.label}>
-                    📷 Product Image
-                </label>
-
-                <input
-                    id="productImage"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    style={styles.fileInput}
-                />
-
-
-                {/* IMAGE PREVIEW */}
-
-                {product.imageUrl && (
-
-                    <div style={styles.previewBox}>
-
-                        <p style={styles.previewText}>
-                            Product Image
-                        </p>
-
-                        <img
-                            src={product.imageUrl}
-                            alt="Product Preview"
-                            style={styles.previewImage}
-                        />
-
-                    </div>
-
-                )}
-
-
-                {/* SUBMIT */}
-
-                <button
-                    type="submit"
-                    style={styles.submitButton}
-                    disabled={loading}
+                <form
+                    style={styles.formCard}
+                    onSubmit={handleSubmit}
                 >
 
-                    {loading
+                    <h2 style={styles.formTitle}>
 
-                        ? "⏳ Saving..."
+                        {editingId !== null
+                            ? "✏️ Edit Product"
+                            : "➕ Add New Product"}
 
-                        : editingId !== null
-                            ? "💾 Update Product"
-                            : "➕ Add Product"
-
-                    }
-
-                </button>
+                    </h2>
 
 
-                {/* CANCEL */}
+                    <label style={styles.label}>
+                        Product Name
+                    </label>
 
-                {editingId !== null && (
+                    <input
+                        style={styles.input}
+                        type="text"
+                        name="name"
+                        placeholder="Example: Premium Watch"
+                        value={product.name}
+                        onChange={handleChange}
+                        required
+                    />
+
+
+                    <label style={styles.label}>
+                        Description
+                    </label>
+
+                    <textarea
+                        style={styles.textarea}
+                        name="description"
+                        placeholder="Enter product description"
+                        value={product.description}
+                        onChange={handleChange}
+                        required
+                    />
+
+
+                    <label style={styles.label}>
+                        Price
+                    </label>
+
+                    <input
+                        style={styles.input}
+                        type="number"
+                        name="price"
+                        placeholder="₹ Price"
+                        value={product.price}
+                        onChange={handleChange}
+                        min="0"
+                        step="0.01"
+                        required
+                    />
+
+
+                    <label style={styles.label}>
+                        Stock Quantity
+                    </label>
+
+                    <input
+                        style={styles.input}
+                        type="number"
+                        name="stockQuantity"
+                        placeholder="Available quantity"
+                        value={product.stockQuantity}
+                        onChange={handleChange}
+                        min="0"
+                        step="1"
+                        required
+                    />
+
+
+                    <label style={styles.label}>
+                        Category
+                    </label>
+
+                    <input
+                        style={styles.input}
+                        type="text"
+                        name="category"
+                        placeholder="Example: Watches"
+                        value={product.category}
+                        onChange={handleChange}
+                        required
+                    />
+
+
+                    {/* IMAGE */}
+
+                    <label style={styles.label}>
+                        📷 Product Image
+                    </label>
+
+                    <input
+                        id="productImage"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        style={styles.fileInput}
+                    />
+
+
+                    {/* IMAGE PREVIEW */}
+
+                    {product.imageUrl && (
+
+                        <div style={styles.previewBox}>
+
+                            <p style={styles.previewText}>
+                                Product Image
+                            </p>
+
+                            <img
+                                src={product.imageUrl}
+                                alt="Product Preview"
+                                style={styles.previewImage}
+                            />
+
+                        </div>
+
+                    )}
+
+
+                    {/* SUBMIT */}
+
+                    <button
+                        type="submit"
+                        style={styles.submitButton}
+                        disabled={loading}
+                    >
+
+                        {loading
+
+                            ? "⏳ Saving..."
+
+                            : editingId !== null
+                                ? "💾 Update Product"
+                                : "➕ Add Product"
+
+                        }
+
+                    </button>
+
+
+                    {/* CANCEL */}
 
                     <button
                         type="button"
                         style={styles.cancelButton}
                         onClick={cancelEdit}
                     >
-                        Cancel Edit
+                        Close Form
                     </button>
 
-                )}
+
+                    {/* MESSAGE */}
+
+                    {message && (
+
+                        <div style={styles.message}>
+                            {message}
+                        </div>
+
+                    )}
+
+                </form>
+
+            )}
 
 
-                {/* MESSAGE */}
+            {/* =================================================
+                GLOBAL MESSAGE (when form is closed)
+            ================================================= */}
 
-                {message && (
+            {!editingId && !showAddForm && message && (
 
-                    <div style={styles.message}>
-                        {message}
-                    </div>
+                <div style={{ ...styles.message, maxWidth: "700px", margin: "0 auto 25px auto" }}>
+                    {message}
+                </div>
 
-                )}
-
-            </form>
+            )}
 
 
             {/* =================================================
@@ -867,7 +894,7 @@ function SellerProducts() {
             ================================================= */}
 
             <h2 style={styles.productsTitle}>
-                🛍️ My / All Products
+                🛍️ Your Listed Products
             </h2>
 
 
@@ -1040,6 +1067,17 @@ const styles = {
     welcome: {
         margin: "8px 0 0",
         fontSize: "16px"
+    },
+
+    addProductHeaderBtn: {
+        backgroundColor: "#22c55e",
+        color: "white",
+        border: "none",
+        padding: "12px 20px",
+        borderRadius: "10px",
+        fontWeight: "bold",
+        cursor: "pointer",
+        boxShadow: "0 4px 12px rgba(34, 197, 94, 0.3)"
     },
 
     backButton: {

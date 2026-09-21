@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { API_BASE_URL } from "./config";
 
 function Register() {
 
@@ -54,7 +55,7 @@ function Register() {
         try {
 
             const response = await fetch(
-                "https://shalini-mart-production.up.railway.app/api/register",
+                `${API_BASE_URL}/api/register`,
                 {
                     method: "POST",
 

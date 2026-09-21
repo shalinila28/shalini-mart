@@ -17,6 +17,8 @@ import OrderHistory from "./OrderHistory";
 import SellerDashboard from "./SellerDashboard";
 import SellerProduct from "./SellerProducts";
 import SellerOrders from "./SellerOrders";
+import AddProduct from "./AddProduct";
+import EditProduct from "./EditProduct";
 
 import AdminDashboard from "./AdminDashboard";
 import AdminUsers from "./AdminUsers";
@@ -98,6 +100,13 @@ function App() {
                     ========================= */}
 
                     <Route
+                        path="/seller"
+                        element={
+                            <SellerDashboard />
+                        }
+                    />
+
+                    <Route
                         path="/seller-dashboard"
                         element={
                             <SellerDashboard />
@@ -108,6 +117,41 @@ function App() {
                         path="/seller/products"
                         element={
                             <SellerProduct />
+                        }
+                    />
+
+                    <Route
+                        path="/seller-products"
+                        element={
+                            <SellerProduct />
+                        }
+                    />
+
+                    <Route
+                        path="/seller/products/add"
+                        element={
+                            <AddProduct />
+                        }
+                    />
+
+                    <Route
+                        path="/seller/add-product"
+                        element={
+                            <AddProduct />
+                        }
+                    />
+
+                    <Route
+                        path="/seller/products/edit/:id"
+                        element={
+                            <EditProduct />
+                        }
+                    />
+
+                    <Route
+                        path="/seller/edit-product/:id"
+                        element={
+                            <EditProduct />
                         }
                     />
 
