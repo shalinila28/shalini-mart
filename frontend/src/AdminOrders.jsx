@@ -7,6 +7,8 @@ function AdminOrders() {
     const navigate = useNavigate();
 
     const [orders, setOrders] = useState([]);
+    const [orderItemsMap, setOrderItemsMap] = useState({});
+    const [productsMap, setProductsMap] = useState({});
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState("");
 
@@ -53,7 +55,7 @@ function AdminOrders() {
 
 
     // =====================================================
-    // LOAD ORDERS
+    // LOAD ORDERS & ITEMS
     // =====================================================
 
     const loadOrders = async () => {
@@ -61,6 +63,15 @@ function AdminOrders() {
         try {
 
             setLoading(true);
+
+            // Fetch Products
+            const prodRes = await fetch(`${API_BASE_URL}/api/admin/products`);
+            if (prodRes.ok) {
+                const prodData = await prodRes.json();
+                const pMap = {};
+                prodData.forEach(p => { pMap[p.id] = p; });
+                setProductsMap(pMap);
+            }
 
             const response = await fetch(
                 `${API_BASE_URL}/api/admin/orders`
@@ -77,6 +88,22 @@ function AdminOrders() {
 
             setOrders(data);
             setMessage("");
+
+            // Fetch items for each order
+            const itemsMap = {};
+            await Promise.all(
+                data.map(async (order) => {
+                    try {
+                        const itemsRes = await fetch(`${API_BASE_URL}/api/orders/${order.id}/items`);
+                        if (itemsRes.ok) {
+                            itemsMap[order.id] = await itemsRes.json();
+                        }
+                    } catch (e) {
+                        itemsMap[order.id] = [];
+                    }
+                })
+            );
+            setOrderItemsMap(itemsMap);
 
         } catch (error) {
 
@@ -112,7 +139,7 @@ function AdminOrders() {
                     </h1>
 
                     <h2>
-                        📦 Manage Orders
+                        📦 Manage Customer Orders
                     </h2>
 
                 </div>
@@ -160,66 +187,112 @@ function AdminOrders() {
                 <>
 
                     <h2>
-                        All Customer Orders
+                        All Customer Orders ({orders.length})
                     </h2>
 
 
-                    {orders.map((order) => (
+                    {orders.map((order) => {
+                        const items = orderItemsMap[order.id] || [];
 
-                        <div
-                            key={order.id}
-                            style={styles.orderCard}
-                        >
+                        return (
 
-                            <h2>
-                                📦 Order #{order.id}
-                            </h2>
+                            <div
+                                key={order.id}
+                                style={styles.orderCard}
+                            >
 
-                            <p>
-                                <strong>
-                                    Customer ID:
-                                </strong>{" "}
-                                {order.customerId}
-                            </p>
+                                <div style={styles.orderCardHeader}>
+                                    <h2>
+                                        📦 Order #{order.id}
+                                    </h2>
 
-                            <p>
-                                <strong>
-                                    Total Amount:
-                                </strong>{" "}
-                                ₹{order.totalAmount}
-                            </p>
-
-                            <p>
-                                <strong>
-                                    Status:
-                                </strong>{" "}
-
-                                <span
-                                    style={
-                                        styles.status
-                                    }
-                                >
-                                    {order.status}
-                                </span>
-
-                            </p>
-
-                            {order.createdAt && (
+                                    <span
+                                        style={
+                                            styles.status
+                                        }
+                                    >
+                                        {order.status}
+                                    </span>
+                                </div>
 
                                 <p>
                                     <strong>
-                                        Order Date:
+                                        Customer ID:
                                     </strong>{" "}
-                                    {String(
-                                        order.createdAt
-                                    )}
+                                    {order.customerId}
                                 </p>
 
-                            )}
+                                <p>
+                                    <strong>
+                                        Total Amount:
+                                    </strong>{" "}
+                                    <span style={styles.amountText}>₹{Number(order.totalAmount || 0).toFixed(2)}</span>
+                                </p>
 
-                        </div>
+                                {/* CONTACT & ADDRESS */}
+                                {(order.phone || order.address) && (
+                                    <div style={styles.customerInfoBox}>
+                                        <h4 style={{ margin: "0 0 6px 0", color: "#334155" }}>📍 Customer Delivery Details</h4>
+                                        {order.phone && (
+                                            <p style={{ margin: "2px 0" }}>
+                                                <strong>📞 Phone:</strong> {order.phone}
+                                            </p>
+                                        )}
+                                        {order.address && (
+                                            <p style={{ margin: "2px 0" }}>
+                                                <strong>🏠 Address:</strong> {order.address}
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
 
-                    ))}
+                                {order.orderDate && (
+                                    <p>
+                                        <strong>
+                                            Order Date:
+                                        </strong>{" "}
+                                        {new Date(order.orderDate).toLocaleString()}
+                                    </p>
+                                )}
+
+                                {/* ORDER ITEMS */}
+                                {items.length > 0 && (
+                                    <div style={styles.itemsSection}>
+                                        <h4 style={{ margin: "10px 0 6px 0", color: "#1e293b" }}>Ordered Items:</h4>
+                                        <div style={styles.itemsGrid}>
+                                            {items.map((item, idx) => {
+                                                const product = productsMap[item.productId];
+                                                return (
+                                                    <div key={item.id || idx} style={styles.itemBox}>
+                                                        <div>
+                                                            <b>{product ? product.name : `Product #${item.productId}`}</b>
+                                                            <div style={styles.badgeRow}>
+                                                                {item.color && (
+                                                                    <span style={styles.badge}>
+                                                                        🎨 Color: {item.color}
+                                                                    </span>
+                                                                )}
+                                                                {item.size && (
+                                                                    <span style={styles.badge}>
+                                                                        📏 Size: {item.size}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            Qty: <b>{item.quantity}</b> × ₹{item.price} = <b>₹{(item.quantity * item.price).toFixed(2)}</b>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
+
+                            </div>
+
+                        );
+                    })}
 
                 </>
 
@@ -236,7 +309,7 @@ const styles = {
         minHeight: "100vh",
         padding: "30px",
         backgroundColor: "#f5f5f5",
-        fontFamily: "Arial"
+        fontFamily: "Arial, sans-serif"
     },
 
     header: {
@@ -270,17 +343,79 @@ const styles = {
     orderCard: {
         backgroundColor: "white",
         padding: "20px",
-        marginBottom: "15px",
+        marginBottom: "20px",
         borderRadius: "10px",
         boxShadow:
             "0 2px 8px rgba(0,0,0,0.1)"
     },
 
+    orderCardHeader: {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        borderBottom: "1px solid #f1f5f9",
+        paddingBottom: "10px",
+        marginBottom: "12px"
+    },
+
+    amountText: {
+        color: "#16a34a",
+        fontWeight: "bold",
+        fontSize: "16px"
+    },
+
     status: {
         backgroundColor: "#e8f5e9",
-        padding: "5px 10px",
-        borderRadius: "5px",
+        color: "#2e7d32",
+        padding: "6px 12px",
+        borderRadius: "6px",
         fontWeight: "bold"
+    },
+
+    customerInfoBox: {
+        backgroundColor: "#f8fafc",
+        border: "1px solid #e2e8f0",
+        borderRadius: "8px",
+        padding: "12px",
+        marginTop: "10px",
+        marginBottom: "10px"
+    },
+
+    itemsSection: {
+        marginTop: "12px",
+        paddingTop: "10px",
+        borderTop: "1px dashed #e2e8f0"
+    },
+
+    itemsGrid: {
+        display: "flex",
+        flexDirection: "column",
+        gap: "8px"
+    },
+
+    itemBox: {
+        backgroundColor: "#f1f5f9",
+        padding: "10px 14px",
+        borderRadius: "6px",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        flexWrap: "wrap",
+        gap: "10px"
+    },
+
+    badgeRow: {
+        display: "flex",
+        gap: "8px",
+        marginTop: "4px"
+    },
+
+    badge: {
+        backgroundColor: "#e0f2fe",
+        color: "#0369a1",
+        fontSize: "12px",
+        padding: "2px 8px",
+        borderRadius: "4px"
     }
 
 };

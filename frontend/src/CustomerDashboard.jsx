@@ -67,6 +67,46 @@ function CustomerDashboard() {
 
 
     // =========================
+    // VARIANT STATES (COLOR & SIZE)
+    // =========================
+
+    const [selectedColor, setSelectedColor] = useState({});
+    const [selectedSize, setSelectedSize] = useState({});
+
+    // Variant Helper Functions
+    const getCategoryType = (product) => {
+        const text = `${product.category || ""} ${product.name || ""} ${product.description || ""}`.toLowerCase();
+        if (text.includes("shoe") || text.includes("footwear") || text.includes("sneaker") || text.includes("boot") || text.includes("sandal") || text.includes("croc") || text.includes("loafer") || text.includes("slipper") || text.includes("heel")) {
+            return "SHOE";
+        }
+        if (text.includes("cloth") || text.includes("shirt") || text.includes("pant") || text.includes("t-shirt") || text.includes("tshirt") || text.includes("dress") || text.includes("jean") || text.includes("jacket") || text.includes("hoodie") || text.includes("top") || text.includes("kurti") || text.includes("apparel") || text.includes("wear") || text.includes("fashion") || text.includes("suit") || text.includes("trouser") || text.includes("skirt") || text.includes("saree")) {
+            return "CLOTHES";
+        }
+        return "GENERAL";
+    };
+
+    const getAvailableSizes = (categoryType) => {
+        if (categoryType === "CLOTHES") {
+            return ["XS", "S", "M", "L", "XL", "XXL", "3XL"];
+        }
+        if (categoryType === "SHOE") {
+            return ["UK 6", "UK 7", "UK 8", "UK 9", "UK 10", "UK 11", "UK 12"];
+        }
+        return ["Standard", "Free Size"];
+    };
+
+    const COLOR_PALETTE = [
+        { name: "Black", hex: "#111827" },
+        { name: "White", hex: "#FFFFFF", border: "#D1D5DB" },
+        { name: "Navy Blue", hex: "#1E3A8A" },
+        { name: "Crimson Red", hex: "#DC2626" },
+        { name: "Forest Green", hex: "#15803D" },
+        { name: "Slate Grey", hex: "#4B5563" },
+        { name: "Royal Blue", hex: "#2563EB" },
+        { name: "Beige", hex: "#D4B996" }
+    ];
+
+    // =========================
     // MESSAGE
     // =========================
 
@@ -297,6 +337,11 @@ function CustomerDashboard() {
         }
 
 
+        const catType = getCategoryType(product);
+        const defaultSize = catType === "CLOTHES" ? "M" : catType === "SHOE" ? "UK 8" : "Standard";
+        const chosenColor = selectedColor[product.id] || "Black";
+        const chosenSize = selectedSize[product.id] || defaultSize;
+
         const cartItem = {
 
             customerId:
@@ -308,7 +353,11 @@ function CustomerDashboard() {
             quantity: 1,
 
             price:
-                product.price
+                product.price,
+
+            color: chosenColor,
+
+            size: chosenSize
 
         };
 
@@ -1066,6 +1115,77 @@ function CustomerDashboard() {
                                 </p>
 
 
+                                {/* VARIANT SELECTORS (COLOR & SIZE) */}
+                                {(() => {
+                                    const catType = getCategoryType(product);
+                                    const availableSizes = getAvailableSizes(catType);
+                                    const defaultSize = catType === "CLOTHES" ? "M" : catType === "SHOE" ? "UK 8" : "Standard";
+                                    const activeColor = selectedColor[product.id] || "Black";
+                                    const activeSize = selectedSize[product.id] || defaultSize;
+
+                                    return (
+                                        <div style={styles.variantSection}>
+                                            {/* COLOR SELECTION */}
+                                            <div style={styles.variantGroup}>
+                                                <label style={styles.variantLabel}>
+                                                    🎨 <b>Color:</b> <span style={styles.selectedVariantBadge}>{activeColor}</span>
+                                                </label>
+                                                <div style={styles.colorPalette}>
+                                                    {COLOR_PALETTE.map((col) => (
+                                                        <button
+                                                            key={col.name}
+                                                            type="button"
+                                                            title={col.name}
+                                                            onClick={() =>
+                                                                setSelectedColor((prev) => ({
+                                                                    ...prev,
+                                                                    [product.id]: col.name
+                                                                }))
+                                                            }
+                                                            style={{
+                                                                ...styles.colorCircle,
+                                                                backgroundColor: col.hex,
+                                                                border: col.border ? `2px solid ${col.border}` : "2px solid transparent",
+                                                                outline: activeColor === col.name ? "3px solid #007bff" : "none",
+                                                                outlineOffset: "2px",
+                                                                transform: activeColor === col.name ? "scale(1.15)" : "scale(1)"
+                                                            }}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            {/* SIZE SELECTION */}
+                                            <div style={styles.variantGroup}>
+                                                <label style={styles.variantLabel}>
+                                                    📏 <b>Size ({catType === "CLOTHES" ? "Clothes" : catType === "SHOE" ? "Shoe UK" : "Standard"}):</b>{" "}
+                                                    <span style={styles.selectedVariantBadge}>{activeSize}</span>
+                                                </label>
+                                                <div style={styles.sizePills}>
+                                                    {availableSizes.map((sz) => (
+                                                        <button
+                                                            key={sz}
+                                                            type="button"
+                                                            onClick={() =>
+                                                                setSelectedSize((prev) => ({
+                                                                    ...prev,
+                                                                    [product.id]: sz
+                                                                }))
+                                                            }
+                                                            style={{
+                                                                ...styles.sizePill,
+                                                                ...(activeSize === sz ? styles.sizePillActive : {})
+                                                            }}
+                                                        >
+                                                            {sz}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
+
                                 {/* ADD TO CART */}
 
                                 <button
@@ -1087,7 +1207,7 @@ function CustomerDashboard() {
                                         product.stockQuantity <=
                                         0
                                             ? "Out of Stock"
-                                            : "Add to Cart"
+                                            : "🛒 Add to Cart"
                                     }
 
                                 </button>
@@ -1554,6 +1674,77 @@ const styles = {
         cursor: "pointer",
         backgroundColor: "#dc3545",
         color: "white"
+    },
+
+    variantSection: {
+        backgroundColor: "#f8f9fa",
+        padding: "12px",
+        borderRadius: "8px",
+        marginTop: "12px",
+        marginBottom: "12px",
+        border: "1px solid #e9ecef"
+    },
+
+    variantGroup: {
+        marginBottom: "10px"
+    },
+
+    variantLabel: {
+        fontSize: "13px",
+        color: "#495057",
+        display: "block",
+        marginBottom: "6px"
+    },
+
+    selectedVariantBadge: {
+        backgroundColor: "#e3f2fd",
+        color: "#0d47a1",
+        padding: "2px 8px",
+        borderRadius: "12px",
+        fontWeight: "bold",
+        fontSize: "12px",
+        marginLeft: "4px"
+    },
+
+    colorPalette: {
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "8px",
+        alignItems: "center"
+    },
+
+    colorCircle: {
+        width: "24px",
+        height: "24px",
+        borderRadius: "50%",
+        cursor: "pointer",
+        transition: "transform 0.15s ease, outline 0.15s ease",
+        padding: 0
+    },
+
+    sizePills: {
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "6px"
+    },
+
+    sizePill: {
+        padding: "5px 10px",
+        borderRadius: "6px",
+        border: "1px solid #ced4da",
+        backgroundColor: "#ffffff",
+        color: "#333333",
+        fontSize: "12px",
+        fontWeight: "600",
+        cursor: "pointer",
+        transition: "all 0.15s ease"
+    },
+
+    sizePillActive: {
+        backgroundColor: "#007bff",
+        color: "#ffffff",
+        borderColor: "#007bff",
+        boxShadow: "0 2px 4px rgba(0,123,255,0.25)"
     }
 
 };

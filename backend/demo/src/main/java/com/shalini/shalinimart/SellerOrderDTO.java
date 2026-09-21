@@ -9,6 +9,10 @@ public class SellerOrderDTO {
     private int quantity;
     private double price;
     private String status;
+    private String color;
+    private String size;
+    private String phone;
+    private String address;
 
     public SellerOrderDTO() {
     }
@@ -20,7 +24,11 @@ public class SellerOrderDTO {
             String productName,
             int quantity,
             double price,
-            String status) {
+            String status,
+            String color,
+            String size,
+            String phone,
+            String address) {
 
         this.orderId = orderId;
         this.customerId = customerId;
@@ -29,33 +37,97 @@ public class SellerOrderDTO {
         this.quantity = quantity;
         this.price = price;
         this.status = status;
+        this.color = color;
+        this.size = size;
+        this.phone = phone;
+        this.address = address;
     }
 
     public int getOrderId() {
         return orderId;
     }
 
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
+    }
+
     public int getCustomerId() {
         return customerId;
+    }
+
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
     }
 
     public int getProductId() {
         return productId;
     }
 
+    public void setProductId(int productId) {
+        this.productId = productId;
+    }
+
     public String getProductName() {
         return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
     public int getQuantity() {
         return quantity;
     }
 
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
     public double getPrice() {
         return price;
     }
 
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
     public String getStatus() {
         return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

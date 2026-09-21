@@ -169,15 +169,20 @@ function SellerOrders() {
 
                     <div
                         key={
-                            order.orderId ||
-                            index
+                            order.orderId ? `${order.orderId}-${order.productId}-${index}` : index
                         }
                         style={styles.orderCard}
                     >
 
-                        <h2>
-                            Order #{order.orderId}
-                        </h2>
+                        <div style={styles.orderCardHeader}>
+                            <h2>
+                                📦 Order #{order.orderId}
+                            </h2>
+
+                            <span style={styles.statusBadge}>
+                                {order.status || "CONFIRMED"}
+                            </span>
+                        </div>
 
 
                         <p>
@@ -192,8 +197,24 @@ function SellerOrders() {
                             <strong>
                                 Product:
                             </strong>{" "}
-                            {order.productName}
+                            <span style={{ fontSize: "16px", fontWeight: "bold", color: "#1e3a8a" }}>
+                                {order.productName}
+                            </span>
                         </p>
+
+                        {/* PRODUCT VARIANTS (COLOR & SIZE) */}
+                        <div style={styles.variantRow}>
+                            {order.color && (
+                                <span style={styles.variantBadge}>
+                                    🎨 Color: <b>{order.color}</b>
+                                </span>
+                            )}
+                            {order.size && (
+                                <span style={styles.variantBadge}>
+                                    📏 Size: <b>{order.size}</b>
+                                </span>
+                            )}
+                        </div>
 
 
                         <p>
@@ -208,16 +229,25 @@ function SellerOrders() {
                             <strong>
                                 Price:
                             </strong>{" "}
-                            ₹{order.price}
+                            ₹{order.price} (Item Total: <b>₹{(order.quantity * order.price).toFixed(2)}</b>)
                         </p>
 
-
-                        <p>
-                            <strong>
-                                Status:
-                            </strong>{" "}
-                            {order.status}
-                        </p>
+                        {/* SHIPPING & CONTACT DETAILS */}
+                        {(order.phone || order.address) && (
+                            <div style={styles.shippingBox}>
+                                <h4 style={{ margin: "0 0 6px 0", color: "#334155" }}>🚚 Delivery & Contact Info</h4>
+                                {order.phone && (
+                                    <p style={{ margin: "2px 0", fontSize: "14px" }}>
+                                        <strong>📞 Customer Phone:</strong> {order.phone}
+                                    </p>
+                                )}
+                                {order.address && (
+                                    <p style={{ margin: "2px 0", fontSize: "14px" }}>
+                                        <strong>🏠 Shipping Address:</strong> {order.address}
+                                    </p>
+                                )}
+                            </div>
+                        )}
 
                     </div>
 
@@ -236,7 +266,7 @@ const styles = {
         minHeight: "100vh",
         backgroundColor: "#f5f5f5",
         padding: "30px",
-        fontFamily: "Arial"
+        fontFamily: "Arial, sans-serif"
     },
 
     orderCard: {
@@ -246,6 +276,48 @@ const styles = {
         borderRadius: "10px",
         boxShadow:
             "0 2px 8px rgba(0,0,0,0.1)"
+    },
+
+    orderCardHeader: {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        borderBottom: "1px solid #f1f5f9",
+        paddingBottom: "8px",
+        marginBottom: "12px"
+    },
+
+    statusBadge: {
+        backgroundColor: "#e8f5e9",
+        color: "#2e7d32",
+        padding: "5px 12px",
+        borderRadius: "6px",
+        fontWeight: "bold",
+        fontSize: "13px"
+    },
+
+    variantRow: {
+        display: "flex",
+        gap: "10px",
+        marginTop: "6px",
+        marginBottom: "10px",
+        flexWrap: "wrap"
+    },
+
+    variantBadge: {
+        backgroundColor: "#e0f2fe",
+        color: "#0369a1",
+        padding: "3px 10px",
+        borderRadius: "6px",
+        fontSize: "13px"
+    },
+
+    shippingBox: {
+        backgroundColor: "#f8fafc",
+        border: "1px solid #e2e8f0",
+        borderRadius: "8px",
+        padding: "12px",
+        marginTop: "12px"
     },
 
     empty: {

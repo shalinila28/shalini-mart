@@ -368,6 +368,25 @@ function OrderHistory() {
                                 </div>
                             </div>
 
+                            {/* DELIVERY & CONTACT INFO */}
+                            {(order.phone || order.address) && (
+                                <div style={styles.deliveryInfoBox}>
+                                    <h4 style={styles.deliveryInfoTitle}>📍 Delivery & Contact Details</h4>
+                                    <div style={styles.deliveryInfoContent}>
+                                        {order.phone && (
+                                            <p style={styles.deliveryDetailItem}>
+                                                <strong>📞 Phone:</strong> {order.phone}
+                                            </p>
+                                        )}
+                                        {order.address && (
+                                            <p style={styles.deliveryDetailItem}>
+                                                <strong>🏠 Address:</strong> {order.address}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
                             {/* ORDER STATUS / ACTION BANNER */}
                             {!isReceived ? (
                                 <div style={styles.actionBanner}>
@@ -432,6 +451,21 @@ function OrderHistory() {
 
                                                     <div style={styles.itemInfo}>
                                                         <h4 style={styles.itemName}>{product.name}</h4>
+                                                        
+                                                        {/* COLOR & SIZE BADGES */}
+                                                        <div style={styles.variantBadgesRow}>
+                                                            {item.color && (
+                                                                <span style={styles.orderVariantBadge}>
+                                                                    🎨 Color: <b>{item.color}</b>
+                                                                </span>
+                                                            )}
+                                                            {item.size && (
+                                                                <span style={styles.orderVariantBadge}>
+                                                                    📏 Size: <b>{item.size}</b>
+                                                                </span>
+                                                            )}
+                                                        </div>
+
                                                         <p style={styles.itemMeta}>
                                                             Category: <strong>{product.category || "General"}</strong> • 
                                                             Qty: <strong>{item.quantity}</strong> • 
@@ -1090,6 +1124,44 @@ const styles = {
         fontSize: "14px",
         cursor: "pointer",
         boxShadow: "0 4px 12px rgba(37, 99, 235, 0.25)"
+    },
+    deliveryInfoBox: {
+        backgroundColor: "#f8fafc",
+        border: "1px solid #e2e8f0",
+        borderRadius: "8px",
+        padding: "12px 16px",
+        marginTop: "12px",
+        marginBottom: "12px"
+    },
+    deliveryInfoTitle: {
+        fontSize: "13px",
+        fontWeight: "bold",
+        color: "#334155",
+        margin: "0 0 6px 0"
+    },
+    deliveryInfoContent: {
+        display: "flex",
+        flexDirection: "column",
+        gap: "4px"
+    },
+    deliveryDetailItem: {
+        margin: 0,
+        fontSize: "13px",
+        color: "#475569"
+    },
+    variantBadgesRow: {
+        display: "flex",
+        gap: "8px",
+        marginTop: "4px",
+        marginBottom: "6px",
+        flexWrap: "wrap"
+    },
+    orderVariantBadge: {
+        backgroundColor: "#e0f2fe",
+        color: "#0369a1",
+        padding: "2px 8px",
+        borderRadius: "6px",
+        fontSize: "12px"
     }
 };
 

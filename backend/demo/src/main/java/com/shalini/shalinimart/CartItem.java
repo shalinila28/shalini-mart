@@ -18,6 +18,10 @@ public class CartItem {
 
     private double price;
 
+    private String color;
+
+    private String size;
+
     public CartItem() {
     }
 
@@ -28,6 +32,18 @@ public class CartItem {
         this.productId = productId;
         this.quantity = quantity;
         this.price = price;
+    }
+
+    public CartItem(int customerId, int productId,
+                    int quantity, double price,
+                    String color, String size) {
+
+        this.customerId = customerId;
+        this.productId = productId;
+        this.quantity = quantity;
+        this.price = price;
+        this.color = color;
+        this.size = size;
     }
 
     public int getId() {
@@ -64,5 +80,21 @@ public class CartItem {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
     }
 }

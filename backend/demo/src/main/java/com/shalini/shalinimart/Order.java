@@ -19,6 +19,11 @@ public class Order {
 
     private LocalDateTime orderDate;
 
+    private String phone;
+
+    @Column(length = 1000)
+    private String address;
+
     public Order() {
     }
 
@@ -26,6 +31,15 @@ public class Order {
         this.customerId = customerId;
         this.totalAmount = totalAmount;
         this.status = status;
+        this.orderDate = LocalDateTime.now();
+    }
+
+    public Order(int customerId, double totalAmount, String status, String phone, String address) {
+        this.customerId = customerId;
+        this.totalAmount = totalAmount;
+        this.status = status;
+        this.phone = phone;
+        this.address = address;
         this.orderDate = LocalDateTime.now();
     }
 
@@ -63,5 +77,21 @@ public class Order {
 
     public void setOrderDate(LocalDateTime orderDate) {
         this.orderDate = orderDate;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

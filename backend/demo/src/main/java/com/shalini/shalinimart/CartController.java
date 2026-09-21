@@ -36,11 +36,18 @@ public class CartController {
     public CartItem addToCart(
             @RequestBody CartItem cartItem) {
 
+        String color = cartItem.getColor() != null ? cartItem.getColor().trim() : "";
+        String size = cartItem.getSize() != null ? cartItem.getSize().trim() : "";
+        cartItem.setColor(color);
+        cartItem.setSize(size);
+
         var existingItem =
                 cartItemRepository
-                        .findByCustomerIdAndProductId(
+                        .findByCustomerIdAndProductIdAndColorAndSize(
                                 cartItem.getCustomerId(),
-                                cartItem.getProductId()
+                                cartItem.getProductId(),
+                                color,
+                                size
                         );
 
         if (existingItem.isPresent()) {

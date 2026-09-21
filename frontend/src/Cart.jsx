@@ -16,13 +16,16 @@ function Cart() {
     const customerId = loggedInUser?.id;
 
 
-    // =========================
-    // STATES
-    // =========================
-
     const [cart, setCart] = useState([]);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    // Checkout Modal State
+    const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+    const [phone, setPhone] = useState("");
+    const [address, setAddress] = useState("");
+    const [formError, setFormError] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
 
     // =========================
@@ -226,65 +229,78 @@ function Cart() {
 
 
     // =========================
-    // CHECKOUT
+    // OPEN CHECKOUT MODAL
     // =========================
 
-    const checkout = () => {
-
+    const openCheckoutModal = () => {
         if (cart.length === 0) {
+            alert("Your cart is empty.");
+            return;
+        }
+        setFormError("");
+        setShowCheckoutModal(true);
+    };
 
-            alert(
-                "Your cart is empty."
-            );
+    // =========================
+    // SUBMIT CHECKOUT
+    // =========================
 
+    const handleConfirmCheckout = (e) => {
+        if (e) e.preventDefault();
+
+        // Validation
+        const cleanPhone = phone.trim();
+        const cleanAddress = address.trim();
+
+        if (!cleanPhone) {
+            setFormError("⚠️ Please enter your Phone Number.");
             return;
         }
 
-        const total = getTotal();
-
-        const confirmPayment =
-            window.confirm(
-                `Confirm mock payment of ₹${total.toFixed(2)}?`
-            );
-
-        if (!confirmPayment) {
+        const phoneRegex = /^[0-9]{10}$/;
+        if (!phoneRegex.test(cleanPhone.replace(/[\s-]/g, ""))) {
+            setFormError("⚠️ Please enter a valid 10-digit Phone Number.");
             return;
         }
 
-        fetch(
-            `${API_BASE_URL}/api/orders/checkout/${customerId}`,
-            {
-                method: "POST"
-            }
-        )
-            .then(response => {
+        if (!cleanAddress || cleanAddress.length < 5) {
+            setFormError("⚠️ Please enter a complete Delivery Address (at least 5 characters).");
+            return;
+        }
 
-                if (!response.ok) {
-                    throw new Error(
-                        "Checkout failed"
-                    );
-                }
+        setIsSubmitting(true);
+        setFormError("");
 
-                return response.text();
-
+        fetch(`${API_BASE_URL}/api/orders/checkout/${customerId}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                phone: cleanPhone,
+                address: cleanAddress
             })
-            .then(data => {
-
-                alert(data);
-
-                loadCart();
-
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Checkout failed");
+                }
+                return response.json().catch(() => response.text());
+            })
+            .then(() => {
+                setShowCheckoutModal(false);
+                setPhone("");
+                setAddress("");
+                alert("🎉 Order placed successfully! Track your order in My Orders.");
+                navigate("/orders");
             })
             .catch(error => {
-
                 console.error(error);
-
-                alert(
-                    "Cannot connect to backend."
-                );
-
+                setFormError("Unable to complete checkout. Please try again.");
+            })
+            .finally(() => {
+                setIsSubmitting(false);
             });
-
     };
 
 
@@ -538,6 +554,21 @@ function Cart() {
                                         </h3>
 
 
+                                        {/* COLOR & SIZE BADGES */}
+                                        <div style={styles.variantDisplayRow}>
+                                            {item.color && (
+                                                <span style={styles.itemVariantBadge}>
+                                                    🎨 Color: <b>{item.color}</b>
+                                                </span>
+                                            )}
+                                            {item.size && (
+                                                <span style={styles.itemVariantBadge}>
+                                                    📏 Size: <b>{item.size}</b>
+                                                </span>
+                                            )}
+                                        </div>
+
+
                                         <p>
                                             Price:
                                             ₹{item.price}
@@ -661,15 +692,98 @@ function Cart() {
                             style={
                                 styles.checkoutButton
                             }
-                            onClick={checkout}
+                            onClick={openCheckoutModal}
                         >
-                            💳 Checkout
+                            💳 Proceed to Checkout
                         </button>
 
                     </div>
 
                 </div>
 
+            )}
+
+            {/* CHECKOUT & DELIVERY MODAL */}
+            {showCheckoutModal && (
+                <div style={styles.modalOverlay}>
+                    <div style={styles.modalContent}>
+                        <div style={styles.modalHeader}>
+                            <h2>📦 Complete Your Order</h2>
+                            <button
+                                style={styles.modalCloseBtn}
+                                onClick={() => setShowCheckoutModal(false)}
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        <p style={styles.modalSubtext}>
+                            Please provide your contact number and delivery address to place your order.
+                        </p>
+
+                        {formError && (
+                            <div style={styles.modalErrorBox}>
+                                {formError}
+                            </div>
+                        )}
+
+                        <form onSubmit={handleConfirmCheckout} style={styles.checkoutForm}>
+                            <div style={styles.formGroup}>
+                                <label style={styles.formLabel}>
+                                    📞 <b>Phone Number *</b>
+                                </label>
+                                <input
+                                    type="tel"
+                                    placeholder="e.g. 9876543210"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
+                                    maxLength="15"
+                                    required
+                                    style={styles.formInput}
+                                />
+                                <small style={styles.formHint}>10-digit mobile number for delivery updates</small>
+                            </div>
+
+                            <div style={styles.formGroup}>
+                                <label style={styles.formLabel}>
+                                    🏠 <b>Delivery Address *</b>
+                                </label>
+                                <textarea
+                                    placeholder="Enter complete delivery address (House/Flat No, Street, Landmark, City, State, PIN code)..."
+                                    value={address}
+                                    onChange={(e) => setAddress(e.target.value)}
+                                    rows="3"
+                                    required
+                                    style={styles.formTextarea}
+                                />
+                            </div>
+
+                            {/* ORDER SUMMARY PREVIEW */}
+                            <div style={styles.orderSummaryBox}>
+                                <div><b>Total Items:</b> {cart.reduce((t, i) => t + Number(i.quantity), 0)}</div>
+                                <div><b>Grand Total:</b> <span style={{ color: "#28a745", fontSize: "18px" }}>₹{getTotal().toFixed(2)}</span></div>
+                            </div>
+
+                            <div style={styles.modalFooter}>
+                                <button
+                                    type="button"
+                                    style={styles.cancelBtn}
+                                    onClick={() => setShowCheckoutModal(false)}
+                                    disabled={isSubmitting}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    style={styles.confirmOrderBtn}
+                                    disabled={isSubmitting}
+                                >
+                                    {isSubmitting ? "Placing Order..." : "✅ Confirm & Place Order"}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             )}
 
         </div>
@@ -841,9 +955,156 @@ const styles = {
         borderRadius: "6px",
         cursor: "pointer",
         fontSize: "16px"
+    },
+
+    variantDisplayRow: {
+        display: "flex",
+        gap: "10px",
+        marginTop: "6px",
+        marginBottom: "6px",
+        flexWrap: "wrap"
+    },
+
+    itemVariantBadge: {
+        backgroundColor: "#e8f0fe",
+        color: "#1967d2",
+        padding: "3px 8px",
+        borderRadius: "6px",
+        fontSize: "13px"
+    },
+
+    modalOverlay: {
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: "rgba(0, 0, 0, 0.6)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 1000,
+        padding: "20px"
+    },
+
+    modalContent: {
+        backgroundColor: "white",
+        borderRadius: "12px",
+        padding: "25px",
+        maxWidth: "500px",
+        width: "100%",
+        boxShadow: "0 8px 30px rgba(0,0,0,0.25)"
+    },
+
+    modalHeader: {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: "10px"
+    },
+
+    modalCloseBtn: {
+        background: "none",
+        border: "none",
+        fontSize: "20px",
+        cursor: "pointer",
+        color: "#6c757d"
+    },
+
+    modalSubtext: {
+        color: "#6c757d",
+        fontSize: "14px",
+        marginBottom: "18px"
+    },
+
+    modalErrorBox: {
+        backgroundColor: "#f8d7da",
+        color: "#721c24",
+        padding: "10px 14px",
+        borderRadius: "6px",
+        marginBottom: "15px",
+        fontSize: "14px"
+    },
+
+    checkoutForm: {
+        display: "flex",
+        flexDirection: "column",
+        gap: "16px"
+    },
+
+    formGroup: {
+        display: "flex",
+        flexDirection: "column",
+        gap: "6px"
+    },
+
+    formLabel: {
+        fontSize: "14px",
+        color: "#333333"
+    },
+
+    formInput: {
+        padding: "10px 12px",
+        borderRadius: "6px",
+        border: "1px solid #ced4da",
+        fontSize: "15px",
+        outline: "none"
+    },
+
+    formTextarea: {
+        padding: "10px 12px",
+        borderRadius: "6px",
+        border: "1px solid #ced4da",
+        fontSize: "14px",
+        fontFamily: "inherit",
+        outline: "none",
+        resize: "vertical"
+    },
+
+    formHint: {
+        color: "#6c757d",
+        fontSize: "12px"
+    },
+
+    orderSummaryBox: {
+        backgroundColor: "#f8f9fa",
+        padding: "14px",
+        borderRadius: "8px",
+        border: "1px solid #e9ecef",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        fontSize: "15px"
+    },
+
+    modalFooter: {
+        display: "flex",
+        justifyContent: "flex-end",
+        gap: "12px",
+        marginTop: "10px"
+    },
+
+    cancelBtn: {
+        backgroundColor: "#6c757d",
+        color: "white",
+        border: "none",
+        padding: "10px 18px",
+        borderRadius: "6px",
+        cursor: "pointer",
+        fontSize: "14px"
+    },
+
+    confirmOrderBtn: {
+        backgroundColor: "#28a745",
+        color: "white",
+        border: "none",
+        padding: "10px 22px",
+        borderRadius: "6px",
+        cursor: "pointer",
+        fontWeight: "bold",
+        fontSize: "14px"
     }
 
 };
-
 
 export default Cart;

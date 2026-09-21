@@ -2,8 +2,11 @@ package com.shalini.shalinimart;
 
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -13,15 +16,18 @@ public class OrderController {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final CartItemRepository cartItemRepository;
+    private final ProductRepository productRepository;
 
     public OrderController(
             OrderRepository orderRepository,
             OrderItemRepository orderItemRepository,
-            CartItemRepository cartItemRepository) {
+            CartItemRepository cartItemRepository,
+            ProductRepository productRepository) {
 
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.cartItemRepository = cartItemRepository;
+        this.productRepository = productRepository;
     }
 
     // =========================================================
@@ -30,7 +36,8 @@ public class OrderController {
 
     @PostMapping("/checkout/{customerId}")
     public Object checkout(
-            @PathVariable int customerId) {
+            @PathVariable int customerId,
+            @RequestBody(required = false) CheckoutRequest checkoutRequest) {
 
         // Get customer's cart
         List<CartItem> cartItems =
@@ -50,12 +57,17 @@ public class OrderController {
                     item.getPrice() * item.getQuantity();
         }
 
+        String phone = checkoutRequest != null ? checkoutRequest.getPhone() : "";
+        String address = checkoutRequest != null ? checkoutRequest.getAddress() : "";
+
         // Create order
         Order order =
                 new Order(
                         customerId,
                         totalAmount,
-                        "CONFIRMED"
+                        "CONFIRMED",
+                        phone,
+                        address
                 );
 
         // Save order first
@@ -70,7 +82,9 @@ public class OrderController {
                             savedOrder.getId(),
                             item.getProductId(),
                             item.getQuantity(),
-                            item.getPrice()
+                            item.getPrice(),
+                            item.getColor(),
+                            item.getSize()
                     );
 
             orderItemRepository.save(orderItem);
@@ -108,6 +122,51 @@ public class OrderController {
         return orderItemRepository.findByOrderId(
                 orderId
         );
+    }
+
+
+    // =========================================================
+    // SELLER INCOMING ORDERS
+    // =========================================================
+
+    @GetMapping("/seller/{sellerId}")
+    public List<SellerOrderDTO> getSellerOrders(
+            @PathVariable int sellerId) {
+
+        List<Product> sellerProducts = productRepository.findBySellerId(sellerId);
+        if (sellerProducts.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        Map<Integer, Product> productMap = sellerProducts.stream()
+                .collect(Collectors.toMap(Product::getId, p -> p, (p1, p2) -> p1));
+
+        List<Integer> productIds = new ArrayList<>(productMap.keySet());
+        List<OrderItem> orderItems = orderItemRepository.findByProductIdIn(productIds);
+
+        List<SellerOrderDTO> dtoList = new ArrayList<>();
+        for (OrderItem item : orderItems) {
+            Product prod = productMap.get(item.getProductId());
+            Optional<Order> orderOpt = orderRepository.findById(item.getOrderId());
+            if (orderOpt.isPresent() && prod != null) {
+                Order ord = orderOpt.get();
+                dtoList.add(new SellerOrderDTO(
+                        ord.getId(),
+                        ord.getCustomerId(),
+                        prod.getId(),
+                        prod.getName(),
+                        item.getQuantity(),
+                        item.getPrice(),
+                        ord.getStatus(),
+                        item.getColor(),
+                        item.getSize(),
+                        ord.getPhone(),
+                        ord.getAddress()
+                ));
+            }
+        }
+
+        return dtoList;
     }
 
 

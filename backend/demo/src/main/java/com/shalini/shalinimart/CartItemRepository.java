@@ -14,4 +14,11 @@ public interface CartItemRepository
             int customerId,
             int productId
     );
+
+    Optional<CartItem> findByCustomerIdAndProductIdAndColorAndSize(
+            int customerId,
+            int productId,
+            String color,
+            String size
+    );
 }
